@@ -7004,6 +7004,7 @@ textarea.form-control-lg {
 
 .d-grid {
   display: grid !important;
+  /* display: grid; */
 }
 
 .d-table {

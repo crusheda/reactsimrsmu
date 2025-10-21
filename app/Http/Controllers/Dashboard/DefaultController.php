@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\datalogs;
@@ -95,12 +94,9 @@ class DefaultController extends Controller
                 'countLogs' => $countLogs,
             ];
 
-            return Inertia::render('Dashboard', [
-                'list' => $data
-            ]);
-            // return view('pages.dashboard.index')->with('list', $data); // ->with('list', $data)
+            return view('pages.dashboard.index')->with('list', $data); // ->with('list', $data)
         } else {
-            return redirect()->route('login');
+            return redirect()->route('auth.login');
         }
     }
 
