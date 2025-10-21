@@ -1,0 +1,72 @@
+/* =======================================================
+   🌐 APP.CSS — MIGRASI DARI LAYOUT LAMA KE VITE/REACT
+   ======================================================= */
+
+/* 1️⃣ Font & Base Styling */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* 2️⃣ Bootstrap (pastikan sudah terinstall via npm) */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+/* 3️⃣ DataTables */
+@import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
+
+/* 4️⃣ SweetAlert2 */
+@import 'sweetalert2/dist/sweetalert2.min.css';
+
+/* 5️⃣ Animate.css */
+@import 'animate.css/animate.min.css';
+
+/* 6️⃣ CropperJS */
+@import 'cropperjs/dist/cropper.css';
+
+/* 7️⃣ Font Awesome */
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+/* 8️⃣ Custom Layout Lama (jika dulu punya public/css/style.css) */
+@import '~public/css/style.css'; /* file dari folder public/css */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9fafb;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* 9️⃣ Komponen Auth (Login Card dsb) */
+.auth-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);
+}
+
+.auth-wrapper.v1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.auth-form {
+    width: 100%;
+    /* max-width: 400px; */
+}
+
+/* .text-primary {
+    color: #4f46e5;
+} */
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 10️⃣ Responsiveness */
+@media (max-width: 768px) {
+    .auth-form {
+        max-width: 90%;
+    }
+}
