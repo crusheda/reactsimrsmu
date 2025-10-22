@@ -293,7 +293,7 @@
       document
         .querySelector("html")
         .style.removeProperty("--body-bg-rgb", localStorage.bodyBgRGB);
-      checkOptions();
+    //   checkOptions();
       html.style.removeProperty("--body-bg-rgb2");
       html.style.removeProperty("--light-rgb");
       html.style.removeProperty("--form-control-bg");
@@ -322,7 +322,7 @@
       document.querySelector("#switcher-dark-theme").checked = true;
       document.querySelector("#switcher-menu-transparent").checked = true;
       document.querySelector("#switcher-header-transparent").checked = true;
-      checkOptions();
+    //   checkOptions();
       document.querySelector("#switcher-menu-transparent").checked = true;
       document.querySelector("#switcher-header-transparent").checked = true;
       document.querySelector("#switcher-dark-theme").checked = true;
@@ -360,7 +360,7 @@
         document
           .querySelector("html")
           .style.removeProperty("--body-bg-rgb", localStorage.bodyBgRGB);
-        checkOptions();
+        // checkOptions();
         html.style.removeProperty("--body-bg-rgb2");
         html.style.removeProperty("--light-rgb");
         html.style.removeProperty("--form-control-bg");
@@ -389,7 +389,7 @@
         document.querySelector("#switcher-dark-theme").checked = true;
         document.querySelector("#switcher-menu-transparent").checked = true;
         document.querySelector("#switcher-header-transparent").checked = true;
-        checkOptions();
+        // checkOptions();
         document.querySelector("#switcher-menu-transparent").checked = true;
         document.querySelector("#switcher-header-transparent").checked = true;
         document.querySelector("#switcher-dark-theme").checked = true;
@@ -518,35 +518,6 @@
   }
   /* header dropdowns scroll */
 
-  const autoCompleteJS = new autoComplete({
-    selector: "#header-search",
-    data: {
-      src: [
-        "How do plants adapt to different environments?",
-        "What makes the ocean's tides rise and fall?",
-        "How do our brains process emotions?",
-        "What factors contribute to the creation of a rainbow?",
-        "Who invented the telephone?",
-        "What role does the moon play in Earth's ecosystem?",
-        "How do animals communicate with each other?",
-        "What causes earthquakes to happen?",
-        "What is the significance of the Great Barrier Reef?",
-        "How do human bones regenerate after an injury?"
-      ],
-      cache: true,
-    },
-    resultItem: {
-      highlight: true
-    },
-    events: {
-      input: {
-        selection: (event) => {
-          const selection = event.detail.selection.value;
-          autoCompleteJS.input.value = selection;
-        }
-      }
-    }
-  });
 })();
 
 /* full screen */
@@ -612,12 +583,12 @@ headerbtn.forEach((button) => {
     cartCount = document.querySelectorAll(".dropdown-item-close").length;
     if (cartDataEl) {
         cartDataEl.innerText = `${cartCount}`;
-    } 
+    }
     if (cartBadgeEl) {
       cartBadgeEl.innerText = `${cartCount}`;
     }
     console.log(cartCount);
-    
+
     if (cartCount == 0) {
       let elementHide = document.querySelector(".empty-header-item");
       let elementShow = document.querySelector(".empty-item");
@@ -627,7 +598,7 @@ headerbtn.forEach((button) => {
       if (elementShow) {
         elementShow.classList.remove("d-none");
       }
-    } 
+    }
   });
 });
 /* for cart dropdown */

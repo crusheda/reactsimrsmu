@@ -53,7 +53,7 @@
     <!-- [phosphor Icons] https://phosphoricons.com/ -->
     <link rel="stylesheet" href="{{ asset('fonts/phosphor/duotone/style.css') }}">
     <!-- [Tabler Icons] https://tablericons.com -->
-    <link rel="stylesheet" href="{{ asset('fonts/tabler-icons.min.css') }}"><!-- [Feather Icons] https://feathericons.com -->
+    <link rel="stylesheet" href="{{ asset('fonts/tabler-icons.min.css') }}">
     <link rel="stylesheet" href="{{ asset('fonts/feather.css') }}">
     <!-- [Font Awesome Icons] https://fontawesome.com/icons -->
     <link rel="stylesheet" href="{{ asset('fonts/fontawesome.css') }}">

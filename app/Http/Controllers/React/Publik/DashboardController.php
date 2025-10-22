@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\React\Dashboard;
+namespace App\Http\Controllers\React\Publik;
 
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;

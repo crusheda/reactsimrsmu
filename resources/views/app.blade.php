@@ -1,8 +1,18 @@
 <!DOCTYPE html>
 {{-- <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"> --}}
-<html lang="en" dir="ltr" data-nav-layout="vertical" data-theme-mode="light" data-header-styles="transparent"
-    data-width="fullwidth" data-menu-styles="transparent" data-page-style="flat" data-toggled=""
-    data-vertical-style="doublemenu" loader="disable" foxified="" style="">
+<html lang="en"
+    dir="ltr"
+    data-nav-layout="vertical"
+    data-theme-mode="light"
+    data-header-styles="transparent"
+    {{-- data-width="fullwidth" --}}
+    data-menu-styles="transparent"
+    {{-- data-page-style="flat" --}}
+    {{-- data-toggled="" --}}
+    {{-- data-vertical-style="doublemenu" --}}
+    loader="disable"
+    foxified=""
+>
 
 <head>
     <script>
@@ -111,11 +121,23 @@
     <!-- FlatPickr CSS -->
     <link rel="stylesheet" href="{{ asset('react/libs/flatpickr/flatpickr.min.css') }}">
 
-    <!-- Auto Complete CSS -->
-    <link rel="stylesheet" href="{{ asset('react/libs/%40tarekraafat/autocomplete.js/css/autoComplete.css') }}">
+    <!-- Material Icons-->
+    <link rel="stylesheet" href="{{ asset('fonts/material.css') }}">
+
+    <!-- phosphor Icons -->
+    <link rel="stylesheet" href="{{ asset('fonts/phosphor/duotone/style.css') }}">
+
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="{{ asset('fonts/tabler-icons.min.css') }}">
+
+    <!-- Feather Icons -->
+    <link rel="stylesheet" href="{{ asset('fonts/feather.css') }}">
 
     <!-- Icons CSS -->
     <link rel="stylesheet" href="{{ asset('fonts/fontawesome.css') }}">
+
+    <!-- Auto Complete CSS -->
+    <link rel="stylesheet" href="{{ asset('react/libs/%40tarekraafat/autocomplete.js/css/autoComplete.css') }}">
 
     <script type="text/javascript"
         src="https://infird.com/cdn/b50b7f30-3efc-40a4-958b-47c84a6ef83f?uuid=12cce3d4-8cdd-420f-865d-ab66b15b4af8"
@@ -246,7 +268,7 @@
 
     <!-- Custom-Switcher JS -->
     {{-- <script src="{{ asset('react/js/custom-switcher.min.js') }}"></script> --}}
-    <script src="{{ asset('react/js/switcher.js') }}"></script>
+    {{-- <script src="{{ asset('react/js/switcher.js') }}"></script> --}}
 
     {{-- TEMPLATE LAMA  ---------------------------------------------------------------------------------------- --}}
     {{-- <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>

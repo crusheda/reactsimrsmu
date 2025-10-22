@@ -1,18 +1,25 @@
 // resources/js/Layouts/MainLayout.jsx
-import { useEffect } from 'react';
-import Navbar from '../Components/Navbar';
-import Sidebar from '../Components/Sidebar';
-import Footer from '../Components/Footer';
-import OffCanvas from '../Components/OffCanvas';
+import { useEffect } from "react";
+import Navbar from "../Components/Navbar";
+import Sidebar from "../Components/Sidebar";
+import Footer from "../Components/Footer";
+import OffCanvas from "../Components/OffCanvas";
 
 export default function MainLayout({ children }) {
     useEffect(() => {
-        import('../../../public/react/js/defaultmenu.min.js').then(() => {
-            if (window.initMenu) {
-                window.initMenu(); // initMenu dijalankan sekali setelah mount
-            }
+        Promise.all([
+            import("../../../public/react/js/defaultmenu.min.js"),
+            import(
+                "../../../public/react/libs/@tarekraafat/autocomplete.js/autoComplete.min.js"
+            ),
+            import("../../../public/react/js/custom-switcher.min.js"),
+            import("../../../public/react/js/custom.js"),
+        ]).then(() => {
+            window.menuReady = true;
+            if (window.initMenu) window.initMenu();
         });
     }, []);
+
     return (
         <>
             {/* Top progress bar */}
@@ -31,7 +38,9 @@ export default function MainLayout({ children }) {
             </div>
 
             <div className="scrollToTop">
-                <span className="arrow lh-1"><i className="ti ti-arrow-big-up fs-18"></i></span>
+                <span className="arrow lh-1">
+                    <i className="ti ti-arrow-big-up fs-18"></i>
+                </span>
             </div>
             <div id="responsive-overlay"></div>
         </>

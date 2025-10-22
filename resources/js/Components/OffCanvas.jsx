@@ -40,7 +40,10 @@ const OffCanvas = () => {
             >
                 <div className="offcanvas-header border-bottom d-block p-0">
                     <div className="d-flex align-items-center justify-content-between p-3">
-                        <h5 className="offcanvas-title text-default" id="offcanvasRightLabel">
+                        <h5
+                            className="offcanvas-title text-default"
+                            id="offcanvasRightLabel"
+                        >
                             Switcher
                         </h5>
                         <button
@@ -98,7 +101,9 @@ const OffCanvas = () => {
                         >
                             {/* Theme Color Mode */}
                             <div>
-                                <p className="switcher-style-head">Theme Color Mode:</p>
+                                <p className="switcher-style-head">
+                                    Theme Color Mode:
+                                </p>
                                 <div className="row switcher-style gx-0">
                                     <div className="col-4">
                                         <div className="form-check switch-select">
@@ -142,8 +147,10 @@ const OffCanvas = () => {
                             </div>
 
                             {/* Directions */}
-                            <div>
-                                <p className="switcher-style-head">Directions:</p>
+                            <div hidden>
+                                <p className="switcher-style-head">
+                                    Directions:
+                                </p>
                                 <div className="row switcher-style gx-0">
                                     <div className="col-4">
                                         <div className="form-check switch-select">
@@ -154,7 +161,10 @@ const OffCanvas = () => {
                                                 id="switcher-ltr"
                                                 defaultChecked
                                             />
-                                            <label className="form-check-label" htmlFor="switcher-ltr">
+                                            <label
+                                                className="form-check-label"
+                                                htmlFor="switcher-ltr"
+                                            >
                                                 LTR
                                             </label>
                                         </div>
@@ -167,7 +177,10 @@ const OffCanvas = () => {
                                                 name="direction"
                                                 id="switcher-rtl"
                                             />
-                                            <label className="form-check-label" htmlFor="switcher-rtl">
+                                            <label
+                                                className="form-check-label"
+                                                htmlFor="switcher-rtl"
+                                            >
                                                 RTL
                                             </label>
                                         </div>
@@ -176,8 +189,10 @@ const OffCanvas = () => {
                             </div>
 
                             {/* Navigation Styles */}
-                            <div>
-                                <p className="switcher-style-head">Navigation Styles:</p>
+                            <div hidden>
+                                <p className="switcher-style-head">
+                                    Navigation Styles:
+                                </p>
                                 <div className="row switcher-style gx-0">
                                     <div className="col-4">
                                         <div className="form-check switch-select">
@@ -188,7 +203,10 @@ const OffCanvas = () => {
                                                 id="switcher-vertical"
                                                 defaultChecked
                                             />
-                                            <label className="form-check-label" htmlFor="switcher-vertical">
+                                            <label
+                                                className="form-check-label"
+                                                htmlFor="switcher-vertical"
+                                            >
                                                 Vertical
                                             </label>
                                         </div>
@@ -201,7 +219,10 @@ const OffCanvas = () => {
                                                 name="navigation-style"
                                                 id="switcher-horizontal"
                                             />
-                                            <label className="form-check-label" htmlFor="switcher-horizontal">
+                                            <label
+                                                className="form-check-label"
+                                                htmlFor="switcher-horizontal"
+                                            >
                                                 Horizontal
                                             </label>
                                         </div>
@@ -210,10 +231,17 @@ const OffCanvas = () => {
                             </div>
 
                             {/* Navigation Menu Styles */}
-                            <div className="navigation-menu-styles">
-                                <p className="switcher-style-head">Vertical & Horizontal Menu Styles:</p>
+                            <div className="navigation-menu-styles" hidden>
+                                <p className="switcher-style-head">
+                                    Vertical & Horizontal Menu Styles:
+                                </p>
                                 <div className="row switcher-style gx-0 pb-2 gy-2">
-                                    {['menu-click', 'menu-hover', 'icon-click', 'icon-hover'].map((item, idx) => (
+                                    {[
+                                        "menu-click",
+                                        "menu-hover",
+                                        "icon-click",
+                                        "icon-hover",
+                                    ].map((item, idx) => (
                                         <div className="col-4" key={idx}>
                                             <div className="form-check switch-select">
                                                 <input
@@ -221,10 +249,19 @@ const OffCanvas = () => {
                                                     type="radio"
                                                     name="navigation-menu-styles"
                                                     id={`switcher-${item}`}
-                                                    defaultChecked={item === 'menu-click'}
+                                                    defaultChecked={
+                                                        item === "menu-click"
+                                                    }
                                                 />
-                                                <label className="form-check-label" htmlFor={`switcher-${item}`}>
-                                                    {item.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                <label
+                                                    className="form-check-label"
+                                                    htmlFor={`switcher-${item}`}
+                                                >
+                                                    {item
+                                                        .replace("-", " ")
+                                                        .replace(/\b\w/g, (l) =>
+                                                            l.toUpperCase()
+                                                        )}
                                                 </label>
                                             </div>
                                         </div>
@@ -233,16 +270,18 @@ const OffCanvas = () => {
                             </div>
 
                             {/* Sidemenu Layout Styles */}
-                            <div className="sidemenu-layout-styles">
-                                <p className="switcher-style-head">Sidemenu Layout Styles:</p>
+                            <div className="sidemenu-layout-styles" hidden>
+                                <p className="switcher-style-head">
+                                    Sidemenu Layout Styles:
+                                </p>
                                 <div className="row switcher-style gx-0 pb-2 gy-2">
                                     {[
-                                        'default-menu',
-                                        'closed-menu',
-                                        'icontext-menu',
-                                        'icon-overlay',
-                                        'detached',
-                                        'double-menu'
+                                        "default-menu",
+                                        "closed-menu",
+                                        "icontext-menu",
+                                        "icon-overlay",
+                                        "detached",
+                                        "double-menu",
                                     ].map((item, idx) => (
                                         <div className="col-sm-6" key={idx}>
                                             <div className="form-check switch-select">
@@ -251,10 +290,19 @@ const OffCanvas = () => {
                                                     type="radio"
                                                     name="sidemenu-layout-styles"
                                                     id={`switcher-${item}`}
-                                                    defaultChecked={item === 'double-menu'}
+                                                    defaultChecked={
+                                                        item === "double-menu"
+                                                    }
                                                 />
-                                                <label className="form-check-label" htmlFor={`switcher-${item}`}>
-                                                    {item.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                <label
+                                                    className="form-check-label"
+                                                    htmlFor={`switcher-${item}`}
+                                                >
+                                                    {item
+                                                        .replace("-", " ")
+                                                        .replace(/\b\w/g, (l) =>
+                                                            l.toUpperCase()
+                                                        )}
                                                 </label>
                                             </div>
                                         </div>
@@ -263,21 +311,39 @@ const OffCanvas = () => {
                             </div>
 
                             {/* Page Styles */}
-                            <div>
-                                <p className="switcher-style-head">Page Styles:</p>
+                            <div hidden>
+                                <p className="switcher-style-head">
+                                    Page Styles:
+                                </p>
                                 <div className="row switcher-style gx-0">
-                                    {['regular', 'classic', 'modern', 'flat'].map((item, idx) => (
-                                        <div className="col-xl-3 col-6" key={idx}>
+                                    {[
+                                        "regular",
+                                        "classic",
+                                        "modern",
+                                        "flat",
+                                    ].map((item, idx) => (
+                                        <div
+                                            className="col-xl-3 col-6"
+                                            key={idx}
+                                        >
                                             <div className="form-check switch-select">
                                                 <input
                                                     className="form-check-input"
                                                     type="radio"
                                                     name="page-styles"
                                                     id={`switcher-${item}`}
-                                                    defaultChecked={item === 'flat'}
+                                                    defaultChecked={
+                                                        item === "flat"
+                                                    }
                                                 />
-                                                <label className="form-check-label" htmlFor={`switcher-${item}`}>
-                                                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                <label
+                                                    className="form-check-label"
+                                                    htmlFor={`switcher-${item}`}
+                                                >
+                                                    {item
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                        item.slice(1)}
                                                 </label>
                                             </div>
                                         </div>
@@ -286,21 +352,45 @@ const OffCanvas = () => {
                             </div>
 
                             {/* Layout Width */}
-                            <div>
-                                <p className="switcher-style-head">Layout Width Styles:</p>
+                            <div hidden>
+                                <p className="switcher-style-head">
+                                    Layout Width Styles:
+                                </p>
                                 <div className="row switcher-style gx-0">
-                                    {['default-width', 'full-width', 'boxed'].map((item, idx) => (
-                                        <div className={`col-${item === 'full-width' ? '5' : item === 'boxed' ? '3' : '4'}`} key={idx}>
+                                    {[
+                                        "default-width",
+                                        "full-width",
+                                        "boxed",
+                                    ].map((item, idx) => (
+                                        <div
+                                            className={`col-${
+                                                item === "full-width"
+                                                    ? "5"
+                                                    : item === "boxed"
+                                                    ? "3"
+                                                    : "4"
+                                            }`}
+                                            key={idx}
+                                        >
                                             <div className="form-check switch-select">
                                                 <input
                                                     className="form-check-input"
                                                     type="radio"
                                                     name="layout-width"
                                                     id={`switcher-${item}`}
-                                                    defaultChecked={item === 'full-width'}
+                                                    defaultChecked={
+                                                        item === "full-width"
+                                                    }
                                                 />
-                                                <label className="form-check-label" htmlFor={`switcher-${item}`}>
-                                                    {item.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                                <label
+                                                    className="form-check-label"
+                                                    htmlFor={`switcher-${item}`}
+                                                >
+                                                    {item
+                                                        .replace("-", " ")
+                                                        .replace(/\b\w/g, (l) =>
+                                                            l.toUpperCase()
+                                                        )}
                                                 </label>
                                             </div>
                                         </div>
@@ -309,75 +399,123 @@ const OffCanvas = () => {
                             </div>
 
                             {/* Menu Positions */}
-                            <div>
-                                <p className="switcher-style-head">Menu Positions:</p>
+                            <div hidden>
+                                <p className="switcher-style-head">
+                                    Menu Positions:
+                                </p>
                                 <div className="row switcher-style gx-0">
-                                    {['menu-fixed', 'menu-scroll'].map((item, idx) => (
-                                        <div className="col-4" key={idx}>
-                                            <div className="form-check switch-select">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="radio"
-                                                    name="menu-positions"
-                                                    id={`switcher-${item}`}
-                                                    defaultChecked={item === 'menu-fixed'}
-                                                />
-                                                <label className="form-check-label" htmlFor={`switcher-${item}`}>
-                                                    {item.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </label>
+                                    {["menu-fixed", "menu-scroll"].map(
+                                        (item, idx) => (
+                                            <div className="col-4" key={idx}>
+                                                <div className="form-check switch-select">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name="menu-positions"
+                                                        id={`switcher-${item}`}
+                                                        defaultChecked={
+                                                            item ===
+                                                            "menu-fixed"
+                                                        }
+                                                    />
+                                                    <label
+                                                        className="form-check-label"
+                                                        htmlFor={`switcher-${item}`}
+                                                    >
+                                                        {item
+                                                            .replace("-", " ")
+                                                            .replace(
+                                                                /\b\w/g,
+                                                                (l) =>
+                                                                    l.toUpperCase()
+                                                            )}
+                                                    </label>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    )}
                                 </div>
                             </div>
 
                             {/* Header Positions */}
                             <div>
-                                <p className="switcher-style-head">Header Positions:</p>
+                                <p className="switcher-style-head">
+                                    Header Positions:
+                                </p>
                                 <div className="row switcher-style gx-0">
-                                    {['header-fixed', 'header-scroll'].map((item, idx) => (
-                                        <div className="col-4" key={idx}>
-                                            <div className="form-check switch-select">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="radio"
-                                                    name="header-positions"
-                                                    id={`switcher-${item}`}
-                                                    defaultChecked={item === 'header-fixed'}
-                                                />
-                                                <label className="form-check-label" htmlFor={`switcher-${item}`}>
-                                                    {item.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </label>
+                                    {["header-fixed", "header-scroll"].map(
+                                        (item, idx) => (
+                                            <div className="col-4" key={idx}>
+                                                <div className="form-check switch-select">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name="header-positions"
+                                                        id={`switcher-${item}`}
+                                                        defaultChecked={
+                                                            item ===
+                                                            "header-fixed"
+                                                        }
+                                                    />
+                                                    <label
+                                                        className="form-check-label"
+                                                        htmlFor={`switcher-${item}`}
+                                                    >
+                                                        {item
+                                                            .replace("-", " ")
+                                                            .replace(
+                                                                /\b\w/g,
+                                                                (l) =>
+                                                                    l.toUpperCase()
+                                                            )}
+                                                    </label>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    )}
                                 </div>
                             </div>
 
                             {/* Loader */}
-                            <div>
+                            <div hidden>
                                 <p className="switcher-style-head">Loader:</p>
                                 <div className="row switcher-style gx-0">
-                                    {['loader-enable', 'loader-disable'].map((item, idx) => (
-                                        <div className="col-4" key={idx}>
-                                            <div className="form-check switch-select">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="radio"
-                                                    name="page-loader"
-                                                    id={`switcher-${item}`}
-                                                    defaultChecked={item === 'loader-disable'}
-                                                />
-                                                <label className="form-check-label" htmlFor={`switcher-${item}`}>
-                                                    {item.replace('loader-', '').replace(/\b\w/g, l => l.toUpperCase())}
-                                                </label>
+                                    {["loader-enable", "loader-disable"].map(
+                                        (item, idx) => (
+                                            <div className="col-4" key={idx}>
+                                                <div className="form-check switch-select">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        name="page-loader"
+                                                        id={`switcher-${item}`}
+                                                        defaultChecked={
+                                                            item ===
+                                                            "loader-disable"
+                                                        }
+                                                    />
+                                                    <label
+                                                        className="form-check-label"
+                                                        htmlFor={`switcher-${item}`}
+                                                    >
+                                                        {item
+                                                            .replace(
+                                                                "loader-",
+                                                                ""
+                                                            )
+                                                            .replace(
+                                                                /\b\w/g,
+                                                                (l) =>
+                                                                    l.toUpperCase()
+                                                            )}
+                                                    </label>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    )}
                                 </div>
                             </div>
                         </div>
-
                         {/* Tab 2: Theme Colors */}
                         <div
                             className="tab-pane fade border-0"
@@ -387,7 +525,248 @@ const OffCanvas = () => {
                             tabIndex={0}
                         >
                             {/* Theme Colors content */}
-                            {/* Sama pattern: ganti className, htmlFor, input self-closing */}
+                            <div>
+                                <div className="theme-colors" hidden>
+                                    <p className="switcher-style-head">
+                                        Menu Colors:
+                                    </p>
+                                    <div className="d-flex switcher-style pb-2">
+                                        <div className="form-check switch-select me-3">
+                                            <input
+                                                className="form-check-input color-input color-white"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                type="radio"
+                                                name="menu-colors"
+                                                id="switcher-menu-light"
+                                                aria-label="Light Menu"
+                                                title="Light Menu"
+                                                defaultChecked
+                                            />
+                                        </div>
+                                        <div className="form-check switch-select me-3">
+                                            <input
+                                                className="form-check-input color-input color-dark"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                type="radio"
+                                                name="menu-colors"
+                                                id="switcher-menu-dark"
+                                                aria-label="Dark Menu"
+                                                title="Dark Menu"
+                                            />
+                                        </div>
+                                        <div className="form-check switch-select me-3">
+                                            <input
+                                                className="form-check-input color-input color-primary"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                type="radio"
+                                                name="menu-colors"
+                                                id="switcher-menu-primary"
+                                                aria-label="Color Menu"
+                                                title="Color Menu"
+                                            />
+                                        </div>
+                                        <div className="form-check switch-select me-3">
+                                            <input
+                                                className="form-check-input color-input color-gradient"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                type="radio"
+                                                name="menu-colors"
+                                                id="switcher-menu-gradient"
+                                                aria-label="Gradient Menu"
+                                                title="Gradient Menu"
+                                            />
+                                        </div>
+                                        <div className="form-check switch-select me-3">
+                                            <input
+                                                className="form-check-input color-input color-transparent"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                type="radio"
+                                                name="menu-colors"
+                                                id="switcher-menu-transparent"
+                                                aria-label="Transparent Menu"
+                                                title="Transparent Menu"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="px-4 pb-3 text-muted fs-11">
+                                        Note: If you want to change menu color
+                                        dynamically, change from below Theme
+                                        Primary color picker
+                                    </div>
+                                </div>
+
+                                <div className="theme-colors">
+                                    <p className="switcher-style-head">
+                                        Header Colors:
+                                    </p>
+                                    <div className="d-flex switcher-style pb-2">
+                                        <div className="form-check switch-select me-3">
+                                            <input
+                                                className="form-check-input color-input color-white"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                type="radio"
+                                                name="header-colors"
+                                                id="switcher-header-light"
+                                                aria-label="Light Header"
+                                                title="Light Header"
+                                            />
+                                        </div>
+                                        <div className="form-check switch-select me-3">
+                                            <input
+                                                className="form-check-input color-input color-dark"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                type="radio"
+                                                name="header-colors"
+                                                id="switcher-header-dark"
+                                                aria-label="Dark Header"
+                                                title="Dark Header"
+                                            />
+                                        </div>
+                                        <div className="form-check switch-select me-3">
+                                            <input
+                                                className="form-check-input color-input color-primary"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                type="radio"
+                                                name="header-colors"
+                                                id="switcher-header-primary"
+                                                aria-label="Color Header"
+                                                title="Color Header"
+                                            />
+                                        </div>
+                                        <div className="form-check switch-select me-3">
+                                            <input
+                                                className="form-check-input color-input color-gradient"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                type="radio"
+                                                name="header-colors"
+                                                id="switcher-header-gradient"
+                                                aria-label="Gradient Header"
+                                                title="Gradient Header"
+                                            />
+                                        </div>
+                                        <div className="form-check switch-select me-3">
+                                            <input
+                                                className="form-check-input color-input color-transparent"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                type="radio"
+                                                name="header-colors"
+                                                id="switcher-header-transparent"
+                                                aria-label="Transparent Header"
+                                                title="Transparent Header"
+                                                defaultChecked
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="px-4 pb-3 text-muted fs-11">
+                                        Note: If you want to change header color
+                                        dynamically, change from below Theme
+                                        Primary color picker
+                                    </div>
+                                </div>
+
+                                <div className="theme-colors">
+                                    <p className="switcher-style-head">
+                                        Theme Primary:
+                                    </p>
+                                    <div className="d-flex flex-wrap align-items-center switcher-style">
+                                        {[...Array(5)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="form-check switch-select me-3"
+                                            >
+                                                <input
+                                                    className={`form-check-input color-input color-primary-${
+                                                        i + 1
+                                                    }`}
+                                                    type="radio"
+                                                    name="theme-primary"
+                                                    id={
+                                                        i === 0
+                                                            ? "switcher-primary"
+                                                            : `switcher-primary${i}`
+                                                    }
+                                                />
+                                            </div>
+                                        ))}
+                                        <div className="form-check switch-select ps-0 mt-1 color-primary-light">
+                                            <div className="theme-container-primary"></div>
+                                            <div className="pickr-container-primary"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="theme-colors">
+                                    <p className="switcher-style-head">
+                                        Theme Background:
+                                    </p>
+                                    <div className="d-flex flex-wrap align-items-center switcher-style">
+                                        {[...Array(5)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="form-check switch-select me-3"
+                                            >
+                                                <input
+                                                    className={`form-check-input color-input color-bg-${
+                                                        i + 1
+                                                    }`}
+                                                    type="radio"
+                                                    name="theme-background"
+                                                    id={
+                                                        i === 0
+                                                            ? "switcher-background"
+                                                            : `switcher-background${i}`
+                                                    }
+                                                />
+                                            </div>
+                                        ))}
+                                        <div className="form-check switch-select ps-0 mt-1 tooltip-static-demo color-bg-transparent">
+                                            <div className="theme-container-background"></div>
+                                            <div className="pickr-container-background"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="menu-image mb-3" hidden>
+                                    <p className="switcher-style-head">
+                                        Menu With Background Image:
+                                    </p>
+                                    <div className="d-flex flex-wrap align-items-center switcher-style">
+                                        {[1, 2, 3, 4, 5].map((i, index) => (
+                                            <div
+                                                key={i}
+                                                className="form-check switch-select menu-img-select m-2"
+                                            >
+                                                <input
+                                                    className={`form-check-input bgimage-input bg-img${i}`}
+                                                    type="radio"
+                                                    name="menu-background"
+                                                    id={
+                                                        index === 0
+                                                            ? "switcher-bg-img"
+                                                            : `switcher-bg-img${index}`
+                                                    }
+                                                />
+                                                <div className="bg-img-container">
+                                                    <img
+                                                        src={`/react/images/menu-bg-images/bg-img${i}.jpg`}
+                                                        alt=""
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -398,6 +777,7 @@ const OffCanvas = () => {
                             target="_blank"
                             className="btn btn-primary"
                             rel="noopener noreferrer"
+                            hidden
                         >
                             Buy Now
                         </a>
@@ -406,6 +786,7 @@ const OffCanvas = () => {
                             target="_blank"
                             className="btn btn-secondary"
                             rel="noopener noreferrer"
+                            hidden
                         >
                             Our Portfolio
                         </a>
