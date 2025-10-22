@@ -72,9 +72,9 @@
         content="simrs, simrsmu, sim rspkuskh, pkuskh, rspkuskh, sistem pku, sistem informasi majemen rumah sakit, rumah sakit pku, pku muhammadiyah sukoharjo, pku sukoharjo">
     <meta name="author" content="Yussuf Faisal" />
 
-    <link rel="shortcut icon" href="{{ asset('images/logo/logo_new_light.png') }}">
-    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('images/logo/logo_new_light.png') }}">
-    <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('images/logo/logo_new_light.png') }}">
+    <link rel="shortcut icon" href="{{ asset('react/images/logo/ico_dark.ico') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('react/images/logo/ico_dark.ico') }}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('react/images/logo/ico_dark.ico') }}">
 
     <!-- Favicon -->
     <link rel="icon" href="https://demo.spruko.com/html/bootstrap/vyzor/dist/assets/images/brand-logos/favicon.ico"

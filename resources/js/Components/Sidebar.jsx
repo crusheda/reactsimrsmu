@@ -34,11 +34,11 @@ const Sidebar = () => {
         <aside className="app-sidebar sticky sticky-pin" id="sidebar">
             {/* Start::main-sidebar-header */}
             <div className="main-sidebar-header">
-                <a href="index.html" className="header-logo">
-                    <img src="/react/images/brand-logos/desktop-logo.png" alt="logo" className="desktop-logo" />
-                    <img src="/react/images/brand-logos/toggle-dark.png" alt="logo" className="toggle-dark" />
-                    <img src="/react/images/brand-logos/desktop-dark.png" alt="logo" className="desktop-dark" />
-                    <img src="/react/images/brand-logos/toggle-logo.png" alt="logo" className="toggle-logo" />
+                <a role="button" className="header-logo">
+                    <img src="/react/images/logo/onlylogo/logo_light_verysmall.png" alt="logo" className="desktop-logo" />
+                    <img src="/react/images/logo/onlylogo/logo_dark_verysmall.png" alt="logo" className="toggle-dark" />
+                    <img src="/react/images/logo/onlylogo/logo_dark_verysmall.png" alt="logo" className="desktop-dark" />
+                    <img src="/react/images/logo/onlylogo/logo_light_verysmall.png" alt="logo" className="toggle-logo" />
                 </a>
             </div>
             {/* End::main-sidebar-header */}
@@ -193,7 +193,7 @@ const Sidebar = () => {
 
                         {/* Start::slide */}
                         <li className="slide">
-                            <a href="profile.html" className="side-menu__item p-1 rounded-circle mb-0">
+                            <a role="button" className="side-menu__item p-1 rounded-circle mb-0">
                                 <span className="avatar avatar-md avatar-rounded">
                                     <img
                                         src={auth?.user?.foto || '/react/images/faces/21.jpg'}

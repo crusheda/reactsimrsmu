@@ -47,11 +47,11 @@ export default function Navbar() {
                 <div className="header-content-left">
                     <div className="header-element">
                         <div className="horizontal-logo">
-                            <a href="index.html" className="header-logo">
-                                <img src="/react/images/brand-logos/desktop-logo.png" alt="logo" className="desktop-logo" />
-                                <img src="/react/images/brand-logos/toggle-logo.png" alt="logo" className="toggle-logo" />
-                                <img src="/react/images/brand-logos/desktop-dark.png" alt="logo" className="desktop-dark" />
-                                <img src="/react/images/brand-logos/toggle-dark.png" alt="logo" className="toggle-dark" />
+                            <a role='button' className="header-logo">
+                                <img src="/react/images/logo/onlylogo/logo_light_verysmall.png" alt="logo" className="desktop-logo" />
+                                <img src="/react/images/logo/onlylogo/logo_dark_verysmall.png" alt="logo" className="toggle-dark" />
+                                <img src="/react/images/logo/onlylogo/logo_dark_verysmall.png" alt="logo" className="desktop-dark" />
+                                <img src="/react/images/logo/onlylogo/logo_light_verysmall.png" alt="logo" className="toggle-logo" />
                             </a>
                         </div>
                     </div>

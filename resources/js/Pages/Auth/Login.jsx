@@ -13,10 +13,27 @@ export default function Login() {
     const [captchaImage, setCaptchaImage] = useState('/captcha/math');
     const [spinning, setSpinning] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
     const intervalRef = useRef(null);
     const secondsRef = useRef(0);
     const startRef = useRef(Date.now());
+
+    // 🔹 Ambil tema dari localStorage
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+    }, []);
+
+    const logoTextSrc =
+        theme === 'dark'
+            ? '/react/images/logo/logo_full_text_dark.png'
+            : '/react/images/logo/logo_full_text_light.png';
+
+    const logoSrc =
+        theme === 'dark'
+            ? '/react/images/logo/onlylogo/logo_dark_verysmall.png'
+            : '/react/images/logo/onlylogo/logo_light_verysmall.png';
 
     const reloadCaptcha = () => {
         setSpinning(true); // mulai putar
@@ -67,9 +84,9 @@ export default function Login() {
                                 <div className="card-body p-5">
                                     <div className="mb-4 text-center">
                                         <img
-                                            src="/images/logo/logo_simrsmu_new_kop_31.png"
+                                            src={logoTextSrc}
                                             alt="Logo"
-                                            className="mx-auto d-block mb-2"
+                                            className="mx-auto d-block mb-2 desktop-logo"
                                             style={{ height: '40px' }}
                                         />
                                     </div>
@@ -245,9 +262,8 @@ export default function Login() {
                 <div className="col-xxl-3 col-xl-3 col-lg-12 d-xl-block d-none px-0">
                     <div className="authentication-cover overflow-hidden">
                         <div className="authentication-cover-logo">
-                            <a href="/">
-                                {/* <img src="/react/images/brand-logos/toggle-logo.png" alt="logo" className="desktop-dark" /> */}
-                                <img src="/images/logo/logo_new_dark.png" alt="logo" className="desktop-dark" />
+                            <a role='button'>
+                                <img src={logoSrc} alt="logo" className="desktop-dark" />
                             </a>
                         </div>
                         <div className="authentication-cover-background">
