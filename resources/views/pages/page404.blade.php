@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Halaman Tidak Ditemukan | Simrsmu v3.1</title><!-- [Meta] -->
+    <title>Halaman Tidak Ditemukan - Simrsmu v.4</title><!-- [Meta] -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -42,7 +42,7 @@
                             <div class="text-center">
                                 <h1 class="mt-5"><b>Halaman tidak ditemukan</b></h1>
                                 <p class="mt-2 mb-4 text-muted">Halaman yang Anda lihat telah dipindahkan, dihapus, diganti nama, <br>atau mungkin tidak akan pernah ada!</p>
-                                <a href="{{ route('dashboard') }}" class="btn btn-primary mb-3"><i class="fas fa-home me-1"></i> Kembali ke Home</a>
+                                <a href="{{ route('v4.dashboard') }}" class="btn btn-primary mb-3"><i class="fas fa-home me-1"></i> Kembali ke Home</a>
                             </div>
                         </div>
                     </div>

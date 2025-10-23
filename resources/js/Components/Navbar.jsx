@@ -34,7 +34,7 @@ export default function Navbar() {
     const logout = () => {
         router.post(route("logout"), {
             onSuccess: () => {
-                router.visit(route("login"), {
+                router.visit(route("v4.login"), {
                     replace: true,
                     preserveState: false,
                 });
@@ -91,6 +91,7 @@ export default function Navbar() {
                             spellCheck="false"
                             autoComplete="off"
                             autoCapitalize="off"
+                            disabled={true}
                         />
                         <a
                             role="button"
@@ -226,9 +227,9 @@ export default function Navbar() {
                                     strokeWidth="16"
                                 ></path>
                             </svg>
-                            <span className="header-icon-pulse bg-secondary rounded pulse pulse-secondary"></span>
+                            {/* <span className="header-icon-pulse bg-secondary rounded pulse pulse-secondary"></span> */}
                         </a>
-                        <div className="main-header-dropdown dropdown-menu dropdown-menu-end">
+                        <div className="main-header-dropdown dropdown-menu dropdown-menu-end" hidden>
                             <div className="p-3 bg-primary text-fixed-white d-flex justify-content-between">
                                 <p className="mb-0 fs-16">Notifications</p>
                                 <a
@@ -430,7 +431,7 @@ export default function Navbar() {
                             <ul className="list-unstyled mb-0">
                                 <li>
                                     <Link
-                                        href={route("profil.index")}
+                                        href={route("v4.profil.index")}
                                         className="dropdown-item"
                                         as="button"
                                     >

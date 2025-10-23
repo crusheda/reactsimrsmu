@@ -31,6 +31,12 @@ import 'moment/locale/id';
 moment.locale('id');
 window.moment = moment;
 
+// Dayjs (Locale Indonesia)
+import dayjs from "dayjs";
+import "dayjs/locale/id"; // untuk format tanggal Indonesia
+dayjs.locale("id");
+window.dayjs = dayjs;
+
 // Flatpickr
 import 'flatpickr/dist/flatpickr.min.css';
 import flatpickr from 'flatpickr';

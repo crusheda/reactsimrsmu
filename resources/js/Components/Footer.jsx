@@ -6,13 +6,12 @@ const Footer = () => {
             <footer className="footer mt-auto py-3 text-center">
                 <div className="container">
                     <span className="text-muted">
-                        Copyright © <span id="year">2025</span>{" "}
-                        <a href="#" className="text-dark fw-medium">Vyzor</a>. Designed with{" "}
+                        Copyright © <span id="year">2025</span>{" "}. Made with{" "}
                         <span className="bi bi-heart-fill text-danger"></span> by{" "}
-                        <a href="https://spruko.com/" target="_blank" rel="noopener noreferrer">
-                            <span className="fw-medium text-primary">Spruko</span>
+                        <a href="https://instagram.com/hiyussuf/" target="_blank" rel="noopener noreferrer" data-bs-toggle="tooltip" data-bs-offset="0,4" data-bs-placement="top" data-bs-html="true" title="Lihat Profil Developer"
+                            className='link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover text-decoration-underline'>
+                            <span className="fw-medium text-primary">Sakudewa Tech</span>
                         </a>{" "}
-                        All rights reserved
                     </span>
                 </div>
             </footer>

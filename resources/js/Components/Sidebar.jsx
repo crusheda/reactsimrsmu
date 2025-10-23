@@ -97,10 +97,10 @@ const Sidebar = () => {
                             <span className="category-name">Publik</span>
                         </li>
 
-                        {/* Example slide menu */}
                         <li
                             className={`slide has-sub ${
-                                isActive("/dashboard") || isActive("/feedback")
+                                isActive("/v4/dashboard") ||
+                                isActive("/v4/feedback")
                                     ? "active open"
                                     : ""
                             }`}
@@ -108,21 +108,21 @@ const Sidebar = () => {
                             <a
                                 role="button"
                                 className={`side-menu__item ${
-                                    isActive("/dashboard") ||
-                                    isActive("/feedback")
+                                    isActive("/v4/dashboard") ||
+                                    isActive("/v4/feedback")
                                         ? "active open"
                                         : ""
                                 }`}
                             >
-                                <i className="fas fa-home fs-5 side-menu__icon"></i>
+                                <i className="ri-home-4-line fs-6 side-menu__icon"></i>
                                 <span className="side-menu__label">Publik</span>
                                 <i className="ri-arrow-right-s-line side-menu__angle"></i>
                             </a>
 
                             <ul
                                 className={`slide-menu child1 ${
-                                    isActive("/dashboard") ||
-                                    isActive("/feedback")
+                                    isActive("/v4/dashboard") ||
+                                    isActive("/v4/feedback")
                                         ? "double-menu-active"
                                         : ""
                                 }`}
@@ -132,8 +132,8 @@ const Sidebar = () => {
                                     top: 0,
                                     margin: 0,
                                     display:
-                                        isActive("/dashboard") ||
-                                        isActive("/feedback")
+                                        isActive("/v4/dashboard") ||
+                                        isActive("/v4/feedback")
                                             ? "block"
                                             : "none",
                                     transform: "translate(1px, 128px)",
@@ -154,15 +154,15 @@ const Sidebar = () => {
                                 </li>
                                 <li
                                     className={`slide ${
-                                        isActive("/dashboard")
+                                        isActive("/v4/dashboard")
                                             ? "active open"
                                             : ""
                                     }`}
                                 >
                                     <Link
-                                        href={route("dashboard")}
+                                        href={route("v4.dashboard")}
                                         className={`side-menu__item ${
-                                            isActive("/dashboard")
+                                            isActive("/v4/dashboard")
                                                 ? "active"
                                                 : ""
                                         }`}
@@ -172,15 +172,15 @@ const Sidebar = () => {
                                 </li>
                                 <li
                                     className={`slide ${
-                                        isActive("/feedback")
+                                        isActive("/v4/feedback")
                                             ? "active open"
                                             : ""
                                     }`}
                                 >
                                     <Link
-                                        href={route("feedback")}
+                                        href={route("v4.feedback")}
                                         className={`side-menu__item ${
-                                            isActive("/feedback")
+                                            isActive("/v4/feedback")
                                                 ? "active"
                                                 : ""
                                         }`}
@@ -198,16 +198,16 @@ const Sidebar = () => {
 
                         <li
                             className={`slide ${
-                                isActive("/sdi/pegawai") ? "active open" : ""
+                                isActive("/v4/sdi/pegawai") ? "active open" : ""
                             }`}
                         >
                             <Link
-                                href={handleMenuSingle("sdi.pegawai.index")}
+                                href={handleMenuSingle("v4.sdi.pegawai.index")}
                                 className={`side-menu__item ${
-                                    isActive("/sdi/pegawai") ? "active" : ""
+                                    isActive("/v4/sdi/pegawai") ? "active" : ""
                                 }`}
                             >
-                                <i className="fas fa-theater-masks fs-5 side-menu__icon"></i>
+                                <i className="ri-passport-line fs-6 side-menu__icon"></i>
                                 <span className="side-menu__label">
                                     Daftar Pegawai
                                 </span>
@@ -332,13 +332,13 @@ const Sidebar = () => {
 
                         <li
                             className={`slide ${
-                                isActive("/profil") ? "active open" : ""
+                                isActive("/v4/profil") ? "active open" : ""
                             }`}
                         >
                             <Link
-                                href={route("profil.index")}
+                                href={route("v4.profil.index")}
                                 className={`side-menu__item p-1 rounded-circle mb-0 ${
-                                    isActive("/profil") ? "active" : ""
+                                    isActive("/v4/profil") ? "active" : ""
                                 }`}
                             >
                                 <span className="avatar avatar-md avatar-rounded">

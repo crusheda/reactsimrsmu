@@ -279,8 +279,8 @@ const Pegawai = () => {
                     <div className="d-flex align-center justify-content-between flex-wrap">
                         <h1 className="page-title fw-medium fs-18 mb-0">Table Pegawai <b className="text-primary">RS</b></h1>
                         <ol className="breadcrumb mb-0">
-                            <li className="breadcrumb-item"><a role="button">Daftar Pegawai</a></li>
-                            {/* <li className="breadcrumb-item active" aria-current="page">Tooltips</li> */}
+                            <li className="breadcrumb-item"><a role="button">SDI</a></li>
+                            <li className="breadcrumb-item active" aria-current="page">Daftar Pegawai</li>
                         </ol>
                     </div>
                 </div>
