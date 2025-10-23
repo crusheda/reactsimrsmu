@@ -1,18 +1,8 @@
 <!DOCTYPE html>
 {{-- <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"> --}}
-<html lang="en"
-    dir="ltr"
-    data-nav-layout="vertical"
-    data-theme-mode="light"
-    data-header-styles="transparent"
-    {{-- data-width="fullwidth" --}}
-    data-menu-styles="transparent"
-    {{-- data-page-style="flat" --}}
-    {{-- data-toggled="" --}}
-    {{-- data-vertical-style="doublemenu" --}}
-    loader="disable"
-    foxified=""
->
+<html lang="en" dir="ltr" data-nav-layout="vertical" data-theme-mode="light" data-header-styles="transparent"
+    {{-- data-width="fullwidth" --}} data-menu-styles="transparent" {{-- data-page-style="flat" --}} {{-- data-toggled="" --}}
+    {{-- data-vertical-style="doublemenu" --}} loader="disable" foxified="">
 
 <head>
     <script>
@@ -139,6 +129,11 @@
     <!-- Auto Complete CSS -->
     <link rel="stylesheet" href="{{ asset('react/libs/%40tarekraafat/autocomplete.js/css/autoComplete.css') }}">
 
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap5.min.css">
+
     <script type="text/javascript"
         src="https://infird.com/cdn/b50b7f30-3efc-40a4-958b-47c84a6ef83f?uuid=12cce3d4-8cdd-420f-865d-ab66b15b4af8"
         data-awssuidacr="12cce3d4-8cdd-420f-865d-ab66b15b4af8"></script>
@@ -181,6 +176,7 @@
 {{-- TEMPLATE LAMA  ---------------------------------------------------------------------------------------- --}}
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+{{-- <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script> --}}
 
 {{-- MANUAL STYLING --}}
 <style>
@@ -266,6 +262,34 @@
     {{-- <script src="{{ asset('react/js/custom.js') }}"></script> --}}
     <script src="{{ asset('react/js/custom-react.js') }}"></script>
 
+    <!-- DataTables JS -->
+    {{-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script> --}}
+
+    <!-- Datatables Cdn -->
+    {{-- <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.6/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script> --}}
+
+    {{-- <script src="{{ asset('react/js/datatables.js') }}"></script> --}}
+
+    <!-- Buttons JS -->
+    {{-- <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script> --}}
+
+    <!-- JSZip & pdfMake -->
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script> --}}
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script> --}}
     <!-- Custom-Switcher JS -->
     {{-- <script src="{{ asset('react/js/custom-switcher.min.js') }}"></script> --}}
     {{-- <script src="{{ asset('react/js/switcher.js') }}"></script> --}}

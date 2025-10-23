@@ -374,46 +374,11 @@
     <script>
         let grafik = null; // INITIALIZE GRAPH
         $(document).ready(function() {
+            // GRAFIK INIT
             showGrafikStatusPegawai();
+
             // TABEL PROFIL KARYAWAN INIT
             refresh();
-            // $.ajax({
-            //     url: "/api/profilkaryawan/table",
-            //     type: 'GET',
-            //     dataType: 'json', // added data type
-            //     success: function(res) {
-            //         $("#tampil-tbody").empty();
-            //         res.show.forEach(item => {
-            //             content = "<tr id='data" + item.id + "'>";
-            //             content += `<td><center><div class='btn-group'>
-            //                             <button type='button' class='btn btn-sm btn-link dropdown-toggle hide-arrow ${item.nik?'text-primary':'text-danger'}' data-bs-toggle='dropdown' aria-expanded='false'>`+item.id+`</button>
-            //                             <ul class='dropdown-menu dropdown-menu-right'>`;
-            //                 content += `<li><a href="/kepegawaian/profilkaryawan/${item.id}" class='dropdown-item text-primary'><i class="fa-fw fas fa-search nav-icon me-1"></i> Lihat Profil</a></li>
-            //                             <li><a href='javascript:void(0);' class='dropdown-item text-danger' onclick="nonaktif(` + item.id + `)"><i class="fa-fw fas fa-trash nav-icon me-1"></i> Nonaktif</a></li>`;
-            //             content += `</div></center></td>`;
-            //             content += `<td>${item.name}</td>`;
-            //             content += `<td>${item.nama?item.nama:'<b class="text-danger">Data Tidak Valid</b>'}</td>`;
-            //             content += '<td>' + new Date(item.updated_at).toLocaleString("sv-SE") + '</td>';
-            //             content += `</tr>`;
-            //             $('#tampil-tbody').append(content);
-            //         });
-            //         var table = $('#dttable').DataTable({
-            //             order: [
-            //                 [3, "desc"]
-            //             ],
-            //             bAutoWidth: false,
-            //             aoColumns : [
-            //                 { sWidth: '10%' },
-            //                 { sWidth: '20%' },
-            //                 { sWidth: '55%' },
-            //                 { sWidth: '15%' },
-            //             ],
-            //             displayLength: 10,
-            //             lengthChange: true,
-            //             lengthMenu: [10, 25, 50, 75, 100],
-            //         });
-            //     }
-            // });
         });
 
         // FUNCTION-FUNCTION
@@ -1034,119 +999,5 @@
         function showGrafikProfesi()      { loadGrafik(4, "Berdasarkan Profesi"); }
         function showGrafikStatusPegawai(){ loadGrafik(5, "Berdasarkan Status Pegawai"); }
         function showGrafikStatusKawin()  { loadGrafik(6, "Berdasarkan Status Perkawinan"); }
-
-        // function showGrafikJenisPegawai() {
-
-        // }
-
-        // function showGrafikJenisKelamin() {
-
-        // }
-
-        // function showGrafikPendidikan() {
-
-        // }
-
-        // function showGrafikProfesi() {
-
-        // }
-
-        // function showGrafikStatusPegawai() {
-        //     $.ajax({
-        //         url: "/api/profilkaryawan/grafik/5",
-        //         type: 'GET',
-        //         dataType: 'json', // added data type
-        //         success: function(res) {
-        //             $('#show-card-grafik').prop('hidden',false);
-        //             var options = {
-        //                 chart: {
-        //                     type: "pie",
-        //                     width: "100%",
-        //                     height: "100%"
-        //                 },
-        //                 labels: res.labels, // dari API
-        //                 series: res.series, // dari API
-        //                 colors: ["#4680FF", "#FFB946", "#4BC0C0", "#FF6384", "#9966FF", "#212529", "#FF8BF2", "#3EFF73"],
-        //                 fill: {
-        //                     opacity: [1, .8, .6, .8, 1, .5]
-        //                 },
-        //                 legend: {
-        //                     show: true,
-        //                     position: 'bottom'
-        //                 },
-        //                 dataLabels: {
-        //                     enabled: true
-        //                 },
-        //                 responsive: [{
-        //                     breakpoint: 575,
-        //                     options: {
-        //                         chart: {
-        //                             height: 250
-        //                         },
-        //                         dataLabels: {
-        //                             enabled: false
-        //                         }
-        //                     }
-        //                 }]
-        //             };
-
-        //             // Hapus grafik lama jika ada
-        //             if (grafik) {
-        //                 grafik.destroy();
-        //             }
-
-        //             $('#show-name-grafik').empty().html(`Berdasarkan Status Pegawai ${res.belumMasuk!=0?'<b class="text-danger">('+res.belumMasuk+' pegawai belum diinput)</b>':'<b class="text-success">(Data Seluruh Pegawai)</b>'}`)
-        //             grafik = new ApexCharts($("#grafik-show")[0], options);
-        //             grafik.render().then(() => {
-        //                 grafik.updateOptions({
-        //                     chart: {
-        //                         width: "100%",
-        //                         height: "100%"
-        //                     }
-        //                 });
-        //             });
-
-        //             // Ambil warna dari grafik
-        //             let chartColors = grafik.w.config.colors;
-
-        //             // === Generate list kiri ===
-        //             var total = res.series.reduce((a, b) => a + b, 0);
-        //             var listHTML = "";
-        //             res.labels.forEach(function(label, i) {
-        //                 var jumlah = res.series[i];
-        //                 var persen = total > 0 ? ((jumlah / total) * 100).toFixed(1) : 0;
-
-        //                 listHTML += `
-        //                     <li class="list-group-item">
-        //                         <div class="d-flex align-items-center">
-        //                             <div class="flex-shrink-0">
-        //                                 <div class="avtar avtar-s"><i class="ti ti-player-record f-40" style="color: ${chartColors[i]}"></i></div>
-        //                             </div>
-        //                             <div class="flex-grow-1 ms-3">
-        //                                 <div class="row g-1">
-        //                                     <div class="col-6">
-        //                                         <h6 class="text-dark mb-1">${label}</h6>
-        //                                         <a class="text-muted"><i>REFID # ${res.refid[i]}</i></a>
-        //                                     </div>
-        //                                     <div class="col-6 text-end">
-        //                                         <h6 class="mb-1"><b class="text-${jumlah==0?'dark':'danger'}">${jumlah}</b> Pegawai</h6>
-        //                                         <a class="text-success mb-0">${persen}%</a>
-        //                                     </div>
-        //                                 </div>
-        //                             </div>
-        //                         </div>
-        //                     </li>
-        //                 `;
-        //             });
-
-        //             // render ke UL
-        //             $("#list-grafik").html(listHTML);
-        //         }
-        //     })
-        // }
-
-        // function showGrafikStatusKawin() {
-
-        // }
     </script>
 @endsection

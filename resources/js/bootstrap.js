@@ -10,8 +10,11 @@ import $ from 'jquery';
 window.$ = window.jQuery = $;
 
 // Bootstrap 5
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
+// ApexCharts
+import ApexCharts from "apexcharts";
 
 // Axios
 import axios from 'axios';
@@ -19,8 +22,8 @@ window.axios = axios;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 // iziToast
-import 'izitoast/dist/css/iziToast.min.css';
-import 'izitoast/dist/js/iziToast.min.js';
+// import 'izitoast/dist/css/iziToast.min.css';
+// import 'izitoast/dist/js/iziToast.min.js';
 
 // MomentJS (Locale Indonesia)
 import moment from 'moment';
@@ -39,8 +42,11 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 window.Swal = Swal;
 
 // DataTables
-import 'datatables.net-bs5';
-import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
+// import 'datatables.net-bs5';
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+import "datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css";
+import JSZip from "jszip";
+window.JSZip = JSZip;
 
 // CropperJS
 import 'cropperjs/dist/cropper.css';
@@ -54,12 +60,15 @@ import 'animate.css/animate.min.css';
 import feather from 'feather-icons';
 window.feather = feather;
 
-// Font Awesome (via npm)
-import '@fortawesome/fontawesome-free/css/all.min.css';
+// Font Awesome (via npm) Versi terbaru
+// import '@fortawesome/fontawesome-free/css/all.min.css';
+
+// Izitoast
+import iziToast from "izitoast";
 
 // Tambahan plugin lainnya (sesuai CSS lama kamu)
-import 'notifier-js/dist/css/notifier.css'; // jika kamu pakai Notifier
-import 'notifier-js'; // pastikan paket ini sudah diinstall
+// import 'notifier-js/dist/css/notifier.css'; // jika kamu pakai Notifier
+// import 'notifier-js'; // pastikan paket ini sudah diinstall
 
 // Jalankan script init global
 document.addEventListener('DOMContentLoaded', () => {

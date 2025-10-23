@@ -16191,7 +16191,7 @@ table.dataTable thead th,
 table.dataTable thead td,
 table.dataTable tfoot th,
 table.dataTable tfoot td {
-  text-align: start !important;
+  text-align: start;
 }
 table.table-bordered.dataTable th:first-child,
 table.table-bordered.dataTable th:first-child,
@@ -22154,6 +22154,13 @@ ul.file-manager-activity-list li:last-child {
 .offcanvas.offcanvas-end.mail-info-offcanvas {
   width: 40rem;
 }
+table.dataTable .btn.btn-sm {
+  padding: 0.25rem 0.5rem !important;
+  /* font-size: 0.875rem !important; */
+  line-height: 1.5 !important;
+  border-radius: 0.2rem !important;
+}
+
 .mail-menu-icon svg {
   width: 20px;
   height: 20px;

@@ -1,5 +1,5 @@
 // import '../css/app.css';
-// import './bootstrap';
+import './bootstrap';
 
 // Plugin JS tambahan dari layout lama
 // import 'jquery';
