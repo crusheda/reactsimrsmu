@@ -3,6 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// INITIALIZE
+use App\Http\Controllers\React\Akun\ProfilController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes

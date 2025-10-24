@@ -3608,13 +3608,14 @@
   min-width: 9.375rem;
 }
 .btn-loader {
-  pointer-events: none;
+  /* pointer-events: none; */
   position: relative;
   display: flex;
   align-items: center;
 }
 .btn-loader .loading {
   margin-inline-end: 0.75rem;
+  pointer-events: none !important;
 }
 .btn-loader i {
   animation: loader 1000ms infinite linear;

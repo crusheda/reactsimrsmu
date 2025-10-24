@@ -30,6 +30,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'v4', 'as' => ''], function 
 
     // AKUN
     Route::get('profil', [ProfilController::class, 'index'])->name('v4.profil.index');
+    Route::post('profil/store', [ProfilController::class, 'store'])->name('v4.profil.store');
 
     // PUBLIK
     Route::get('dashboard', [DashboardController::class, 'index'])->name('v4.dashboard');

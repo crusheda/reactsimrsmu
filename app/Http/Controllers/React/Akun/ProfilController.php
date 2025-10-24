@@ -9,9 +9,10 @@ use App\Models\logs;
 use App\Models\users;
 use App\Models\users_foto;
 use App\Models\users_status;
+use App\Models\alamat;
 use App\Models\model_has_roles;
 use Carbon\Carbon;
-use Auth;
+use Auth, Storage, DB;
 
 class ProfilController extends Controller
 {
@@ -33,6 +34,8 @@ class ProfilController extends Controller
                                 ->select('model_has_roles.model_id as id_user','roles.name as nama_role')
                                 ->where('model_has_roles.model_id', '=', $id_user)
                                 ->get();
+        $provinsi = alamat::select('provinsi')->groupBy('provinsi')->get();
+        $kota = alamat::select('nama_kabkota')->groupBy('nama_kabkota')->get();
 
         $data = [
             'user' => $user,
@@ -40,10 +43,171 @@ class ProfilController extends Controller
             'status_user' => $status_user,
             'log_user' => $log_user,
             'role' => $role,
+            'provinsi' => $provinsi,
+            'kota' => $kota,
         ];
 
         return Inertia::render('Akun/Profil', [
             'list' => $data
         ]);
+    }
+
+    function store(Request $request)
+    {
+        $user = Auth::user();
+        $id = $user->id;
+        $tgl = Carbon::now()->isoFormat('dddd, D MMMM Y, HH:mm a');
+
+        $data = users::find($id);
+        if (!$data) {
+            return response()->json(['message' => 'Data pengguna tidak ditemukan'], 404);
+        }
+
+        // ====== VALIDASI FILE UPLOAD ======
+        $request->validate([
+            'upload_sd' => 'nullable|file|mimes:pdf|max:5000',
+            'upload_smp' => 'nullable|file|mimes:pdf|max:5000',
+            'upload_sma' => 'nullable|file|mimes:pdf|max:5000',
+            'upload_d2' => 'nullable|file|mimes:pdf|max:5000',
+            'upload_d3' => 'nullable|file|mimes:pdf|max:5000',
+            'upload_d4' => 'nullable|file|mimes:pdf|max:5000',
+            'upload_s1' => 'nullable|file|mimes:pdf|max:5000',
+            'upload_s1_profesi' => 'nullable|file|mimes:pdf|max:5000',
+            'upload_s2' => 'nullable|file|mimes:pdf|max:5000',
+            'upload_s3' => 'nullable|file|mimes:pdf|max:5000',
+        ]);
+
+        // ====== DATA UTAMA ======
+        $data->nik = $request->nik;
+        // $data->gelar_depan = $request->gelar_depan;
+        $data->nama = $request->nama;
+        // $data->gelar_belakang = $request->gelar_belakang;
+        $data->nick = $request->nick;
+        $data->temp_lahir = $request->temp_lahir;
+        $data->tgl_lahir = $request->tgl_lahir;
+        $data->jns_kelamin = $request->jns_kelamin;
+        $data->status_kawin = $request->status_kawin;
+        $data->email = $request->email;
+        $data->no_hp = $request->no_hp;
+        $data->fb = $request->fb;
+        $data->ig = $request->ig;
+        $data->tt = $request->tt;
+
+        // ====== ALAMAT KTP ======
+        $data->alamat_ktp = $request->alamat_ktp;
+        $data->ktp_provinsi = $request->ktp_provinsi ?? $data->ktp_provinsi;
+        $data->ktp_kabupaten = $request->ktp_kabupaten ?? $data->ktp_kabupaten;
+        $data->ktp_kecamatan = $request->ktp_kecamatan ?? $data->ktp_kecamatan;
+        $data->ktp_kelurahan = $request->ktp_kelurahan ?? $data->ktp_kelurahan;
+
+        // ====== ALAMAT DOMISILI ======
+        if ($request->cek_dom == '0') {
+            $data->alamat_dom = null;
+            $data->dom_provinsi = null;
+            $data->dom_kabupaten = null;
+            $data->dom_kecamatan = null;
+            $data->dom_kelurahan = null;
+        } else {
+            $data->alamat_dom = $request->alamat_dom;
+            $data->dom_provinsi = $request->dom_provinsi ?? $data->dom_provinsi;
+            $data->dom_kabupaten = $request->dom_kabupaten ?? $data->dom_kabupaten;
+            $data->dom_kecamatan = $request->dom_kecamatan ?? $data->dom_kecamatan;
+            $data->dom_kelurahan = $request->dom_kelurahan ?? $data->dom_kelurahan;
+        }
+
+        // ====== PENDIDIKAN ======
+        $data->sd = $request->sd;
+        $data->smp = $request->smp;
+        $data->sma = $request->sma;
+        $data->d1 = $request->d1;
+        $data->d2 = $request->d2;
+        $data->d3 = $request->d3;
+        $data->d4 = $request->d4;
+        $data->s1 = $request->s1;
+        $data->s1_profesi = $request->s1_profesi;
+        $data->s2 = $request->s2;
+        $data->s3 = $request->s3;
+
+        $data->th_sd = $request->th_sd ?? $data->th_sd;
+        $data->th_smp = $request->th_smp ?? $data->th_smp;
+        $data->th_sma = $request->th_sma ?? $data->th_sma;
+        $data->th_d1 = $request->th_d1 ?? $data->th_d1;
+        $data->th_d2 = $request->th_d2 ?? $data->th_d2;
+        $data->th_d3 = $request->th_d3 ?? $data->th_d3;
+        $data->th_d4 = $request->th_d4 ?? $data->th_d4;
+        $data->th_s1 = $request->th_s1 ?? $data->th_s1;
+        $data->th_s1_profesi = $request->th_s1_profesi ?? $data->th_s1_profesi;
+        $data->th_s2 = $request->th_s2 ?? $data->th_s2;
+        $data->th_s3 = $request->th_s3 ?? $data->th_s3;
+
+        // ====== FILE UPLOAD ======
+        $uploadFields = [
+            'sd', 'smp', 'sma', 'd2', 'd3', 'd4', 's1', 's1_profesi', 's2', 's3'
+        ];
+
+        foreach ($uploadFields as $field) {
+            $uploadField = "upload_{$field}";
+            if ($request->hasFile($uploadField)) {
+                $file = $request->file($uploadField);
+                if ($file->isValid()) {
+                    // hapus file lama
+                    if ($data->{"filename_{$field}"} && Storage::exists($data->{"filename_{$field}"})) {
+                        Storage::delete($data->{"filename_{$field}"});
+                    }
+                    // simpan baru
+                    $path = $file->store("public/files/profil/ijazah/{$id}");
+                    $data->{"filename_{$field}"} = $path;
+                }
+            }
+        }
+
+        // ====== RIWAYAT ======
+        $data->pengalaman_kerja = $request->pengalaman_kerja;
+        $data->riwayat_penyakit = $request->riwayat_penyakit;
+        $data->riwayat_penyakit_keluarga = $request->riwayat_penyakit_keluarga;
+        $data->riwayat_operasi = $request->riwayat_operasi;
+        $data->riwayat_penggunaan_obat = $request->riwayat_penggunaan_obat;
+
+        $data->save();
+
+        // ====== RESPONSE UNTUK INERTIA ======
+        return back()->with('message', "Profil berhasil diperbarui pada {$tgl}");
+
+        // return redirect()
+        //     ->route('v4.profil.index')
+        //     ->with('message', 'Profil berhasil diperbarui.');
+    }
+
+    public function apiProvinsi($id)
+    {
+        $data = DB::table('alamat')
+                ->select('nama_kabkota')
+                ->where('provinsi', $id)
+                ->groupBy('nama_kabkota')
+                ->get();
+
+        return response()->json($data, 200);
+    }
+
+    public function apiKota($id)
+    {
+        $data = DB::table('alamat')
+                ->select('kecamatan')
+                ->where('nama_kabkota', $id)
+                ->groupBy('kecamatan')
+                ->get();
+
+        return response()->json($data, 200);
+    }
+
+    public function apiKecamatan($id)
+    {
+        $data = DB::table('alamat')
+                ->select('desa')
+                ->where('kecamatan', $id)
+                ->groupBy('desa')
+                ->get();
+
+        return response()->json($data, 200);
     }
 }
