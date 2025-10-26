@@ -385,7 +385,7 @@ export default function Navbar() {
                             role="button"
                             className="header-link dropdown-toggle"
                             data-bs-toggle="dropdown"
-                            data-bs-auto-close="outside"
+                            // data-bs-auto-close="inside"
                             aria-expanded="false"
                         >
                             <img

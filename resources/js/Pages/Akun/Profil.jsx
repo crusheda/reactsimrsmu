@@ -1,9 +1,12 @@
 import MainLayout from "@/Layouts/MainLayout";
 import React, { useEffect, useState } from "react";
 import { Head, router, usePage, useForm, Link } from "@inertiajs/react";
+import { validateForm } from "@/Helpers/formValidation";
 
 export default function Profil() {
+    // TAB UBAH PROFIL ------------------------------------------------------------------
     const { auth, list } = usePage().props;
+    const foto = list.foto;
     const user = list.user;
     const role = list.role;
     const foto_user = list.foto_user;
@@ -13,6 +16,7 @@ export default function Profil() {
         gelar_depan: list.user.gelar_depan || "",
         nama: list.user.nama || "",
         gelar_belakang: list.user.gelar_belakang || "",
+        nip: list.user.nip || "",
         nik: list.user.nik || "",
         email: list.user.email || "",
         no_hp: list.user.no_hp || "",
@@ -88,14 +92,14 @@ export default function Profil() {
         setData("cek_dom", e.target.checked);
     };
 
-    const handleChange = (name, value) => {
+    const handleChangeUbahPendidikan = (name, value) => {
         setData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleFileChange = (e, field) => {
         const file = e.target.files[0];
         if (file) {
-            handleChange(field, file);
+            handleChangeUbahPendidikan(field, file);
         }
     };
 
@@ -262,15 +266,26 @@ export default function Profil() {
         }
     }, [data.cek_dom]);
 
-    const handleSubmit = (e) => {
+    const handleSubmitUbahProfil = (e) => {
         e.preventDefault();
+        const form = e.target;
+
+        // 🔍 Jalankan validasi
+        const valid = validateForm(form);
+        if (!valid) {
+            Swal.fire({
+                icon: "error",
+                title: "Validasi Gagal!",
+                text: "Mohon lengkapi data yang belum sesuai.",
+            });
+            return;
+        }
 
         const formData = new FormData();
         Object.keys(data).forEach((key) => {
             formData.append(key, data[key]);
         });
 
-        // 🟢 Ambil semua input file dari form
         const uploadFields = [
             "sd",
             "smp",
@@ -283,7 +298,6 @@ export default function Profil() {
             "s2",
             "s3",
         ];
-
         uploadFields.forEach((field) => {
             const fileInput = document.querySelector(`#upload_${field}`);
             if (fileInput && fileInput.files[0]) {
@@ -292,9 +306,8 @@ export default function Profil() {
         });
 
         router.post("/v4/profil/store", formData, {
-            forceFormData: true, // 🟢 penting biar dikirim sebagai multipart/form-data
+            forceFormData: true,
             preserveScroll: true,
-
             onStart: () => {
                 Swal.fire({
                     title: "Menyimpan...",
@@ -303,7 +316,6 @@ export default function Profil() {
                     didOpen: () => Swal.showLoading(),
                 });
             },
-
             onSuccess: () => {
                 Swal.fire({
                     icon: "success",
@@ -313,7 +325,6 @@ export default function Profil() {
                     showConfirmButton: false,
                 });
             },
-
             onError: (errors) => {
                 let pesan = "Terjadi kesalahan saat menyimpan data profil.";
                 if (errors && typeof errors === "object") {
@@ -326,6 +337,145 @@ export default function Profil() {
                 });
             },
         });
+    };
+
+    // TAB UBAH PASSWORD ------------------------------------------------------------------
+
+    const [form, setForm] = useState({
+        current_password: "",
+        new_password: "",
+        new_password_confirmation: "",
+    });
+
+    const [validReq, setValidReq] = useState({
+        minLength: false,
+        capital: false,
+        number: false,
+        special: false,
+    });
+
+    const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+    // 🔍 Cek validasi password baru setiap perubahan
+    useEffect(() => {
+        const pwd = form.new_password;
+
+        const newValidReq = {
+            minLength: pwd.length >= 8,
+            capital: /[A-Z]/.test(pwd),
+            number: /\d/.test(pwd),
+            special: /[!@#$%^&*]/.test(pwd),
+        };
+
+        setValidReq(newValidReq);
+        setIsPasswordValid(Object.values(newValidReq).every(Boolean));
+
+        // Reset konfirmasi jika password baru berubah dan tidak cocok
+        if (
+            form.new_password_confirmation &&
+            form.new_password_confirmation !== pwd
+        ) {
+            setForm((prev) => ({
+                ...prev,
+                new_password_confirmation: "",
+            }));
+        }
+    }, [form.new_password]);
+
+    // 🔹 Handle input perubahan
+    const handleChangePassword = (e) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // 🔹 Validasi manual form
+    const validateForm = (formEl) => {
+        const required = [
+            "current_password",
+            "new_password",
+            "new_password_confirmation",
+        ];
+        return required.every((field) => form[field]?.trim() !== "");
+    };
+
+    // 🔹 Handle submit password
+    const handleSubmitPassword = (e) => {
+        e.preventDefault();
+        const formEl = e.target;
+
+        if (!validateForm(formEl)) {
+            Swal.fire({
+                icon: "error",
+                title: "Validasi Gagal!",
+                text: "Mohon lengkapi semua field wajib.",
+            });
+            return;
+        }
+
+        if (!isPasswordValid) {
+            Swal.fire({
+                icon: "error",
+                title: "Password Tidak Memenuhi Kriteria!",
+                text: "Pastikan password memiliki huruf besar, angka, dan karakter khusus.",
+            });
+            return;
+        }
+
+        if (form.new_password !== form.new_password_confirmation) {
+            Swal.fire({
+                icon: "error",
+                title: "Password Tidak Sama!",
+                text: "Pastikan password konfirmasi sesuai.",
+            });
+            return;
+        }
+
+        router.post(
+            "/v4/profil/ubahpassword",
+            { ...form, _method: "PATCH" },
+            {
+                onStart: () => {
+                    Swal.fire({
+                        title: "Memproses...",
+                        text: "Sedang memperbarui password",
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading(),
+                    });
+                },
+                onSuccess: () => {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Berhasil!",
+                        text: "Password berhasil diperbarui 🎉",
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+
+                    // Reset form & state
+                    setForm({
+                        current_password: "",
+                        new_password: "",
+                        new_password_confirmation: "",
+                    });
+                    setValidReq({
+                        minLength: false,
+                        capital: false,
+                        number: false,
+                        special: false,
+                    });
+                    setIsPasswordValid(false);
+                },
+                onError: (errors) => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal!",
+                        text:
+                            Object.values(errors || {}).join("\n") ||
+                            "Terjadi kesalahan saat memperbarui password.",
+                    });
+                },
+            }
+        );
     };
 
     return (
@@ -371,7 +521,7 @@ export default function Profil() {
                                         <span className="avatar avatar-xxl avatar-rounded bg-info online">
                                             <img
                                                 src={
-                                                    auth?.user?.foto ||
+                                                    foto ||
                                                     "/react/images/faces/21.jpg"
                                                 }
                                                 alt=""
@@ -380,11 +530,11 @@ export default function Profil() {
                                         <div className="mt-4 mb-3 d-flex align-items-center flex-wrap gap-3 justify-content-between">
                                             <div>
                                                 <h5 className="fw-semibold mb-1">
-                                                    {auth?.user?.nama ? (
+                                                    {user?.nama ? (
                                                         <>{auth.user.nama}</>
                                                     ) : (
                                                         <>
-                                                            {auth?.user?.name}{" "}
+                                                            {user?.name}{" "}
                                                             <b className="text-danger">
                                                                 (Profil Belum
                                                                 Lengkap)
@@ -437,7 +587,11 @@ export default function Profil() {
                                                                     )}
                                                             </>
                                                         ) : (
-                                                            <>Last Login: -</>
+                                                            <>
+                                                                {
+                                                                    "Terakhir Login: -"
+                                                                }
+                                                            </>
                                                         )}
                                                     </span>
                                                 </p>
@@ -456,12 +610,12 @@ export default function Profil() {
                                             >
                                                 <button
                                                     className="nav-link active"
-                                                    id="profile-about-tab"
+                                                    id=""
                                                     data-bs-toggle="tab"
-                                                    data-bs-target="#profile-about-tab-pane"
+                                                    data-bs-target="#profil-tab"
                                                     type="button"
                                                     role="tab"
-                                                    aria-controls="profile-about-tab-pane"
+                                                    aria-controls="profil-tab"
                                                     aria-selected="true"
                                                 >
                                                     Data Diri
@@ -473,12 +627,12 @@ export default function Profil() {
                                             >
                                                 <button
                                                     className="nav-link"
-                                                    id="gallery-tab"
+                                                    id=""
                                                     data-bs-toggle="tab"
-                                                    data-bs-target="#gallery-tab-pane"
+                                                    data-bs-target="#ubah-profil-tab"
                                                     type="button"
                                                     role="tab"
-                                                    aria-controls="gallery-tab-pane"
+                                                    aria-controls="ubah-profil-tab"
                                                     aria-selected="false"
                                                 >
                                                     Ubah
@@ -490,12 +644,29 @@ export default function Profil() {
                                             >
                                                 <button
                                                     className="nav-link"
-                                                    id="followers-tab"
+                                                    id=""
                                                     data-bs-toggle="tab"
-                                                    data-bs-target="#followers-tab-pane"
+                                                    data-bs-target="#password-tab"
                                                     type="button"
                                                     role="tab"
-                                                    aria-controls="followers-tab-pane"
+                                                    aria-controls="password-tab"
+                                                    aria-selected="false"
+                                                >
+                                                    Password
+                                                </button>
+                                            </li>
+                                            <li
+                                                className="nav-item"
+                                                role="presentation"
+                                            >
+                                                <button
+                                                    className="nav-link"
+                                                    id=""
+                                                    data-bs-toggle="tab"
+                                                    data-bs-target="#dokumen-tab"
+                                                    type="button"
+                                                    role="tab"
+                                                    aria-controls="dokumen-tab"
                                                     aria-selected="false"
                                                 >
                                                     Dokumen
@@ -508,12 +679,12 @@ export default function Profil() {
                         </div>
                     </div>
                     <div className="col-xl-12">
-                        <div className="tab-content" id="profile-tabs">
+                        <div className="tab-content" id="">
                             <div
                                 className="tab-pane show active p-0 border-0"
-                                id="profile-about-tab-pane"
+                                id="profil-tab"
                                 role="tabpanel"
-                                aria-labelledby="profile-about-tab"
+                                aria-labelledby="profil-tab"
                                 tabIndex="0"
                             >
                                 <div className="row">
@@ -1121,9 +1292,9 @@ export default function Profil() {
                             </div>
                             <div
                                 className="tab-pane p-0 border-0"
-                                id="gallery-tab-pane"
+                                id="ubah-profil-tab"
                                 role="tabpanel"
-                                aria-labelledby="gallery-tab"
+                                aria-labelledby="ubah-profil-tab"
                                 tabIndex="0"
                             >
                                 <div className="card custom-card">
@@ -1144,8 +1315,9 @@ export default function Profil() {
                                     </div>
                                     <div className="card-body">
                                         <form
-                                            onSubmit={handleSubmit}
-                                            className=""
+                                            onSubmit={handleSubmitUbahProfil}
+                                            className="g-3 needs-validation"
+                                            noValidate
                                         >
                                             <div className="row">
                                                 <div className="col-xl-12">
@@ -1934,7 +2106,10 @@ export default function Profil() {
                                                                     <div className="row">
                                                                         <div className="col-sm-6 mb-3">
                                                                             <label className="form-label">
-                                                                                Provinsi
+                                                                                Provinsi{" "}
+                                                                                <span className="text-danger">
+                                                                                    *
+                                                                                </span>
                                                                             </label>
                                                                             <select
                                                                                 name="dom_provinsi"
@@ -1958,8 +2133,10 @@ export default function Profil() {
                                                                                 }
                                                                             >
                                                                                 <option value="">
+                                                                                    --
                                                                                     Pilih
                                                                                     Provinsi
+                                                                                    --
                                                                                 </option>
                                                                                 {list.provinsi.map(
                                                                                     (
@@ -1984,7 +2161,10 @@ export default function Profil() {
 
                                                                         <div className="col-sm-6 mb-3">
                                                                             <label className="form-label">
-                                                                                Kabupaten
+                                                                                Kabupaten{" "}
+                                                                                <span className="text-danger">
+                                                                                    *
+                                                                                </span>
                                                                             </label>
                                                                             <select
                                                                                 name="dom_kabupaten"
@@ -2012,8 +2192,10 @@ export default function Profil() {
                                                                                 }
                                                                             >
                                                                                 <option value="">
+                                                                                    --
                                                                                     Pilih
                                                                                     Kabupaten
+                                                                                    --
                                                                                 </option>
                                                                                 {(
                                                                                     listDomKota ||
@@ -2042,7 +2224,10 @@ export default function Profil() {
 
                                                                         <div className="col-sm-6 mb-3">
                                                                             <label className="form-label">
-                                                                                Kecamatan
+                                                                                Kecamatan{" "}
+                                                                                <span className="text-danger">
+                                                                                    *
+                                                                                </span>
                                                                             </label>
                                                                             <select
                                                                                 name="dom_kecamatan"
@@ -2070,8 +2255,10 @@ export default function Profil() {
                                                                                 }
                                                                             >
                                                                                 <option value="">
+                                                                                    --
                                                                                     Pilih
                                                                                     Kecamatan
+                                                                                    --
                                                                                 </option>
                                                                                 {(
                                                                                     listDomKecamatan ||
@@ -2099,7 +2286,10 @@ export default function Profil() {
 
                                                                         <div className="col-sm-6 mb-3">
                                                                             <label className="form-label">
-                                                                                Kelurahan
+                                                                                Kelurahan{" "}
+                                                                                <span className="text-danger">
+                                                                                    *
+                                                                                </span>
                                                                             </label>
                                                                             <select
                                                                                 name="dom_kelurahan"
@@ -2127,8 +2317,10 @@ export default function Profil() {
                                                                                 }
                                                                             >
                                                                                 <option value="">
+                                                                                    --
                                                                                     Pilih
                                                                                     Kelurahan
+                                                                                    --
                                                                                 </option>
                                                                                 {(
                                                                                     listDomKelurahan ||
@@ -2157,7 +2349,10 @@ export default function Profil() {
                                                                         <div className="col-sm-12">
                                                                             <label className="form-label">
                                                                                 Alamat
-                                                                                Lengkap
+                                                                                Lengkap{" "}
+                                                                                <span className="text-danger">
+                                                                                    *
+                                                                                </span>
                                                                             </label>
                                                                             <textarea
                                                                                 className="form-control"
@@ -2349,7 +2544,7 @@ export default function Profil() {
 
                                                                     return (
                                                                         <div
-                                                                            className="mb-4 border-bottom pb-3"
+                                                                            className={nama !== 's3' ? 'mb-3 border-bottom pb-3' : ''}
                                                                             key={
                                                                                 nama
                                                                             }
@@ -2376,7 +2571,7 @@ export default function Profil() {
                                                                                     onChange={(
                                                                                         e
                                                                                     ) =>
-                                                                                        handleChange(
+                                                                                        handleChangeUbahPendidikan(
                                                                                             nama,
                                                                                             e
                                                                                                 .target
@@ -2405,7 +2600,7 @@ export default function Profil() {
                                                                                     onChange={(
                                                                                         e
                                                                                     ) =>
-                                                                                        handleChange(
+                                                                                        handleChangeUbahPendidikan(
                                                                                             tahun,
                                                                                             e
                                                                                                 .target
@@ -2515,461 +2710,278 @@ export default function Profil() {
                             </div>
                             <div
                                 className="tab-pane p-0 border-0"
-                                id="followers-tab-pane"
+                                id="password-tab"
                                 role="tabpanel"
-                                aria-labelledby="followers-tab"
+                                aria-labelledby="password-tab"
                                 tabIndex="0"
                             >
-                                <div className="row">
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/9.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            JohnDoe
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            john.doe@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                <div className="card custom-card">
+                                    <div className="card-header fw-bold justify-content-between">
+                                        <div>
+                                            Ubah{" "}
+                                            <b className="text-danger">
+                                                Password
+                                            </b>
+                                        </div>
+                                        <div>
+                                            (
+                                            <span className="text-danger">
+                                                *
+                                            </span>
+                                            ) Wajib Diisi
                                         </div>
                                     </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/1.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            SarahSmith
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            sarah.smith@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
+                                    <form
+                                        className="needs-validation"
+                                        noValidate
+                                        onSubmit={handleSubmitPassword}
+                                        encType="multipart/form-data"
+                                    >
+                                        <div className="card-body">
+                                            <div className="row">
+                                                <div className="col-sm-12 mb-3">
+                                                    <div
+                                                        className="alert alert-danger alert-dismissible fade show custom-alert-icon shadow-sm"
+                                                        role="alert"
+                                                    >
+                                                        <h6 className="alert-heading fw-bold mb-3">
+                                                            Keamanan Password
+                                                        </h6>
+                                                        <ul>
+                                                            <li className="mb-2">
+                                                                Jangan berikan{" "}
+                                                                <strong className="text-danger fw-bold">
+                                                                    Password
+                                                                </strong>{" "}
+                                                                anda kepada
+                                                                orang lain
+                                                            </li>
+                                                            <li className="mb-2">
+                                                                Password akan
+                                                                diproses melalui
+                                                                metode{" "}
+                                                                <i className="text-dark fw-bold">
+                                                                    Bcrypt Hash
+                                                                    Password
+                                                                </i>{" "}
+                                                                oleh sistem
+                                                            </li>
+                                                            <li>
+                                                                Apabila anda
+                                                                lupa Password
+                                                                akun Simrsmu,
+                                                                silakan masuk ke
+                                                                laman{" "}
+                                                                <b className="text-danger fw-bold">
+                                                                    Lupa
+                                                                    Password
+                                                                </b>{" "}
+                                                                pada halaman
+                                                                Login
+                                                            </li>
+                                                        </ul>
                                                     </div>
                                                 </div>
+
+                                                <div className="col-sm-6">
+                                                    <div className="mb-3">
+                                                        <label className="form-label">
+                                                            Password Lama{" "}
+                                                            <span className="text-danger">
+                                                                *
+                                                            </span>
+                                                        </label>
+                                                        <input
+                                                            type="password"
+                                                            className="form-control"
+                                                            id="oldPassword"
+                                                            name="current_password"
+                                                            autoComplete="current-password"
+                                                            value={
+                                                                form.current_password
+                                                            }
+                                                            onChange={
+                                                                handleChangePassword
+                                                            }
+                                                            required
+                                                            placeholder="••••••••••"
+                                                        />
+                                                    </div>
+
+                                                    <div className="mb-3">
+                                                        <label className="form-label">
+                                                            Password Baru{" "}
+                                                            <span className="text-danger">
+                                                                *
+                                                            </span>
+                                                        </label>
+                                                        <input
+                                                            type="password"
+                                                            className="form-control"
+                                                            id="newPassword"
+                                                            name="new_password"
+                                                            autoComplete="new_password"
+                                                            value={
+                                                                form.new_password
+                                                            }
+                                                            onChange={
+                                                                handleChangePassword
+                                                            }
+                                                            required
+                                                            placeholder="••••••••••"
+                                                        />
+                                                    </div>
+
+                                                    <div className="mb-3">
+                                                        <label className="form-label">
+                                                            Konfirmasi Password
+                                                            Baru{" "}
+                                                            <span className="text-danger">
+                                                                *
+                                                            </span>
+                                                        </label>
+                                                        <input
+                                                            type="password"
+                                                            className="form-control"
+                                                            id="confirmPassword"
+                                                            name="new_password_confirmation"
+                                                            autoComplete="new_password_confirmation"
+                                                            value={
+                                                                form.new_password_confirmation
+                                                            }
+                                                            onChange={
+                                                                handleChangePassword
+                                                            }
+                                                            required
+                                                            placeholder="••••••••••"
+                                                        />
+                                                        <small>
+                                                            Tuliskan password
+                                                            baru yang sama untuk
+                                                            konfirmasi password
+                                                            baru Anda
+                                                        </small>
+                                                    </div>
+                                                </div>
+
+                                                <div className="col-sm-6">
+                                                    <h6>
+                                                        Password Baru Anda harus
+                                                        memenuhi kriteria
+                                                        sebagai berikut :
+                                                    </h6>
+                                                    <ul className="list-group list-group-flush mb-3">
+                                                        <li className="list-group-item requirements">
+                                                            <i
+                                                                className={`ti ti-circle-check f-16 me-2 ${
+                                                                    validReq.minLength
+                                                                        ? "text-success"
+                                                                        : "text-danger"
+                                                                }`}
+                                                            ></i>
+                                                            Melebihi 8 karakter
+                                                        </li>
+                                                        <li className="list-group-item requirements">
+                                                            <i
+                                                                className={`ti ti-circle-check f-16 me-2 ${
+                                                                    validReq.capital
+                                                                        ? "text-success"
+                                                                        : "text-danger"
+                                                                }`}
+                                                            ></i>
+                                                            Minimal 1 Huruf
+                                                            Kapital (A-Z)
+                                                        </li>
+                                                        <li className="list-group-item requirements">
+                                                            <i
+                                                                className={`ti ti-circle-check f-16 me-2 ${
+                                                                    validReq.number
+                                                                        ? "text-success"
+                                                                        : "text-danger"
+                                                                }`}
+                                                            ></i>
+                                                            Minimal 1 Angka
+                                                            (0-9)
+                                                        </li>
+                                                        <li className="list-group-item requirements">
+                                                            <i
+                                                                className={`ti ti-circle-check f-16 me-2 ${
+                                                                    validReq.special
+                                                                        ? "text-success"
+                                                                        : "text-danger"
+                                                                }`}
+                                                            ></i>
+                                                            Minimal 1 Karakter
+                                                            Khusus (!@#$%^&*)
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
+                                        </div>
+                                        <div className="card-footer btn-page">
+                                            <div className="d-flex justify-content-between flex-wrap gap-2">
+                                                <div className="fs-semibold fs-14">
+                                                    <p className="card-text align-middle">
+                                                        <small>
+                                                            Terakhir password
+                                                            diperbarui :
+                                                        </small>
+                                                        <br />
+                                                        <a
+                                                            className="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover text-decoration-underline"
+                                                            role="button"
+                                                        >
+                                                            {user?.last_updated_password ? (
+                                                                new Date(
+                                                                    user.last_updated_password
+                                                                ).toLocaleString(
+                                                                    "sv-SE"
+                                                                )
+                                                            ) : (
+                                                                <>{"-"}</>
+                                                            )}
+                                                        </a>
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    className="btn btn-secondary"
+                                                    type="submit"
+                                                    id="btn-submit-password"
+                                                    disabled={!isPasswordValid}
+                                                >
+                                                    <i className="ri-rocket-2-line me-1"></i>{" "}
+                                                    Perbarui
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div
+                                className="tab-pane p-0 border-0"
+                                id="dokumen-tab"
+                                role="tabpanel"
+                                aria-labelledby="dokumen-tab"
+                                tabIndex="0"
+                            >
+                                <div className="card custom-card">
+                                    <div className="card-header fw-bold justify-content-between">
+                                        <div>
+                                            Daftar{" "}
+                                            <b className="text-teal">
+                                                Upload Dokumen
+                                            </b>
+                                        </div>
+                                        <div>
+                                            (
+                                            <span className="text-danger">
+                                                *
+                                            </span>
+                                            ) Wajib Diisi
                                         </div>
                                     </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/10.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            MichaelBrown
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            michael.brown@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/2.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            EmmaWilson
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            emma.wilson@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/11.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            JamesTaylor
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            james.taylor@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-danger-ghost">
-                                                            <i className="ri-user-minus-line me-1"></i>
-                                                            Unfollow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/3.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            OliviaJohnson
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            olivia.johnson@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/13.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            DavidMartinez
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            david.martinez@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/4.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            SophiaGarcia
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            sophia.garcia@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/14.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            DanielLee
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            daniel.lee@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/5.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            IsabellaHarris
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            isabella.harris@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-danger-ghost">
-                                                            <i className="ri-user-minus-line me-1"></i>
-                                                            Unfollow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/15.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            WilliamClark
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            william.clark@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/6.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            MiaLewis
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            mia.lewis@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/16.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            AlexanderWalker
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            alexander.walker@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/7.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            CharlotteAllen
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            charlotte.allen@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-primary-ghost">
-                                                            <i className="ri-user-add-line me-1"></i>
-                                                            Follow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-xl-4">
-                                        <div className="card custom-card">
-                                            <div className="card-body">
-                                                <div className="d-flex align-items-center gap-2 flex-wrap">
-                                                    <div className="lh-1">
-                                                        <span className="avatar avatar-lg avatar-rounded">
-                                                            <img
-                                                                src="/react/images/faces/8.jpg"
-                                                                alt=""
-                                                            />
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex-fill">
-                                                        <span className="fw-semibold d-block">
-                                                            BenjaminYoung
-                                                        </span>
-                                                        <span className="text-muted fs-13">
-                                                            benjamin.young@example.com
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <button className="btn btn-danger-ghost">
-                                                            <i className="ri-user-minus-line me-1"></i>
-                                                            Unfollow
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div className="card-body">
+                                        ini halaman Dokumen
                                     </div>
                                 </div>
                             </div>

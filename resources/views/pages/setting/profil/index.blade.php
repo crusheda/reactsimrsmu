@@ -1239,6 +1239,7 @@
                                 {{-- <div class="btn btn-outline-secondary">Cancel</div> --}}
                                 <button class="btn btn-secondary" type="submit" value="Submit" id="btn-submit-password" disabled><i class="ti ti-rocket"></i>&nbsp;&nbsp;Perbarui</button>
                             </div>
+                        </form>
                     </div>
                 </div>
 

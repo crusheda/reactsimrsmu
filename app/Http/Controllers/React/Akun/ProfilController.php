@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\React\Akun;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\logs;
@@ -176,6 +178,48 @@ class ProfilController extends Controller
         // return redirect()
         //     ->route('v4.profil.index')
         //     ->with('message', 'Profil berhasil diperbarui.');
+    }
+
+    public function ubahPassword(Request $request)
+    {
+        $user = Auth::user();
+
+        // ✅ Validasi input
+        $validator = Validator::make($request->all(), [
+            'current_password' => ['required'],
+            'new_password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[A-Z]/',        // huruf besar
+                'regex:/[a-z]/',        // huruf kecil
+                'regex:/[0-9]/',        // angka
+                'regex:/[@$!%*?&]/',    // karakter spesial
+                'confirmed',            // pastikan sama dengan new_password_confirmation
+            ],
+        ], [
+            'new_password.confirmed' => 'Konfirmasi password baru tidak sesuai.',
+            'new_password.regex' => 'Password baru harus mengandung huruf besar, angka, dan karakter spesial.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // ✅ Cek password lama benar
+        if (!Hash::check($request->get('current_password'), $user->password)) {
+            return redirect()->back()->withErrors([
+                'current_password' => 'Password lama tidak sesuai.',
+            ]);
+        }
+
+        // ✅ Simpan password baru dengan hash
+        $user->password = Hash::make($request->get('new_password'));
+        $user->last_updated_password = Carbon::now();
+        $user->save();
+
+        return redirect()->route('v4.profil.index')
+            ->with('message', 'Password berhasil diperbarui!');
     }
 
     public function apiProvinsi($id)
