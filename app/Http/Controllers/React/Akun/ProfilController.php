@@ -180,6 +180,64 @@ class ProfilController extends Controller
         //     ->with('message', 'Profil berhasil diperbarui.');
     }
 
+    public function ubahFoto(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpg,jpeg,png|max:3000',
+        ]);
+
+        $user = Auth::user();
+        $now  = Carbon::now();
+
+        // Simpan file
+        $uploadedFile = $request->file('file');
+        $path = $uploadedFile->store('public/files/foto_profil');
+        $title = $uploadedFile->getClientOriginalName();
+
+        // Ambil role user
+        $role = $user->roles()->pluck('name')->toArray();
+
+        // Simpan / update foto profil
+        $data = users_foto::where('user_id', $user->id)->first();
+
+        if ($data) {
+            $data->name = $user->name;
+            $data->unit = json_encode($role);
+            $data->title = $title;
+            $data->filename = $path;
+            $data->updated_at = $now;
+            $data->save();
+        } else {
+            $data = new users_foto;
+            $data->user_id = $user->id;
+            $data->name = $user->name;
+            $data->unit = json_encode($role);
+            $data->title = $title;
+            $data->filename = $path;
+            $data->updated_at = $now;
+            $data->save();
+        }
+
+        return back()->with('message', 'Foto profil berhasil diperbarui.');
+    }
+
+    public function hapusFoto()
+    {
+        $user = Auth::user();
+        $foto = users_foto::where('user_id', $user->id)->first();
+
+        if ($foto) {
+            // Hapus file dari storage
+            if (Storage::exists($foto->filename)) {
+                // Storage::delete($foto->filename);
+            }
+            // Hapus record
+            $foto->delete();
+        }
+
+        return back()->with('message', 'Foto profil telah dikembalikan ke default.');
+    }
+
     public function ubahPassword(Request $request)
     {
         $user = Auth::user();

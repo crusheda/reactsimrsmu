@@ -5,7 +5,6 @@ import { Link } from "@inertiajs/react";
 export default function Navbar() {
     const [theme, setTheme] = useState("light");
     const { auth } = usePage().props;
-
     // Load theme dari localStorage saat mount
     useEffect(() => {
         const savedTheme = localStorage.getItem("theme") || "light";
@@ -229,7 +228,10 @@ export default function Navbar() {
                             </svg>
                             {/* <span className="header-icon-pulse bg-secondary rounded pulse pulse-secondary"></span> */}
                         </a>
-                        <div className="main-header-dropdown dropdown-menu dropdown-menu-end" hidden>
+                        <div
+                            className="main-header-dropdown dropdown-menu dropdown-menu-end"
+                            hidden
+                        >
                             <div className="p-3 bg-primary text-fixed-white d-flex justify-content-between">
                                 <p className="mb-0 fs-16">Notifications</p>
                                 <a

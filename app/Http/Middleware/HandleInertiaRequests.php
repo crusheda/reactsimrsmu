@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\users_foto;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -29,11 +30,39 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
+        // Ambil foto user kalau login
+        $foto = null;
+        if ($user) {
+            $dataFoto = users_foto::where('user_id', $user->id)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if ($dataFoto) {
+                $foto = asset(str_replace('public/', '/storage/', $dataFoto->filename));
+            }
+        }
+
         return [
             ...parent::share($request),
+
             'auth' => [
-                'user' => $request->user(),
+                // tetap gunakan user asli dari $request->user()
+                'user' => $user ? array_merge($user->toArray(), [
+                    'foto' => $foto,
+                ]) : null,
+            ],
+            'flash' => [
+                'message' => fn () => $request->session()->get('message'),
             ],
         ];
+
+        // return [
+        //     ...parent::share($request),
+        //     'auth' => [
+        //         'user' => $request->user(),
+        //     ],
+        // ];
     }
 }

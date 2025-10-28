@@ -1,16 +1,34 @@
 import MainLayout from "@/Layouts/MainLayout";
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Head, router, usePage, useForm, Link } from "@inertiajs/react";
 import { validateForm } from "@/Helpers/formValidation";
 
 export default function Profil() {
     // TAB UBAH PROFIL ------------------------------------------------------------------
-    const { auth, list } = usePage().props;
-    const foto = list.foto;
+    const [fileFoto, setFile] = useState(null);
+    const { auth, list, flash } = usePage().props;
+    // const foto = list.foto;
     const user = list.user;
     const role = list.role;
     const foto_user = list.foto_user;
     const status_user = list.status_user;
+    const [preview, setPreview] = useState(
+        foto_user && foto_user?.filename
+            ? foto_user.filename.replace("public/", "/storage/")
+            : "/react/images/faces/21.jpg"
+    );
+    const fileInputRefFoto = useRef(null);
+    // useEffect(() => {
+    //     if (flash?.message) {
+    //         Swal.fire({
+    //             icon: "success",
+    //             title: "Berhasil!",
+    //             text: flash.message,
+    //             timer: 2000,
+    //             showConfirmButton: false,
+    //         });
+    //     }
+    // }, [flash]);
     const { data, setData, post, processing, errors } = useForm({
         pengalaman_kerja: list.user.pengalaman_kerja || "",
         gelar_depan: list.user.gelar_depan || "",
@@ -266,6 +284,134 @@ export default function Profil() {
         }
     }, [data.cek_dom]);
 
+    // TAB UBAH PROFIL x FOTO PROFIL ------------------------------------------------------------------
+    const handleChangeFileFoto = (e) => {
+        const selected = e.target.files[0];
+        if (selected) {
+            setPreview(URL.createObjectURL(selected));
+            setFile(selected);
+        } else {
+            setFile(null);
+        }
+    };
+
+    const handleSubmitUbahFotoProfil = () => {
+        if (!fileFoto) {
+            Swal.fire({
+                icon: "warning",
+                title: "Pilih Foto Dulu",
+                text: "Silakan pilih foto Anda terlebih dahulu sebelum mengunggah.",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", fileFoto);
+
+        Swal.fire({
+            title: "Yakin ingin memperbarui foto profil?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Ya, Ubah!",
+            cancelButtonText: "Batal",
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.post("/v4/profil/ubahfoto", formData, {
+                    preserveScroll: true,
+                    onStart: () => {
+                        Swal.fire({
+                            title: "Mengunggah...",
+                            text: "Foto Anda sedang diproses",
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            },
+                        });
+                    },
+                    onSuccess: () => {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil!",
+                            text: "Foto profil berhasil diperbarui.",
+                            timer: 2000,
+                            showConfirmButton: false,
+                        });
+                        if (fileInputRef.current) {
+                            fileInputRef.current.value = null;
+                        }
+                    },
+                    onError: (errors) => {
+                        let pesan =
+                            "Terjadi kesalahan saat memperbarui foto profil.";
+                        if (errors && typeof errors === "object") {
+                            pesan = Object.values(errors).join("\n");
+                        }
+                        Swal.fire({
+                            icon: "error",
+                            title: "Gagal!",
+                            text: pesan,
+                        });
+                    },
+                });
+            }
+        });
+    };
+
+    const handleHapusFoto = () => {
+        Swal.fire({
+            title: "Hapus Foto Profil?",
+            text: "Foto Anda akan dihapus dan diganti dengan foto default.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, Hapus!",
+            cancelButtonText: "Batal",
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                router.delete("/v4/profil/hapusfoto", {
+                    onStart: () => {
+                        Swal.fire({
+                            title: "Menghapus...",
+                            text: "Mohon tunggu sebentar",
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            },
+                        });
+                    },
+                    onSuccess: () => {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Foto Dihapus",
+                            text: "Foto profil berhasil dihapus.",
+                            timer: 2000,
+                            showConfirmButton: false,
+                        });
+                        setPreview("/react/images/faces/21.jpg");
+                        setFile(null);
+                        if (fileInputRefFoto.current) {
+                            fileInputRefFoto.current.value = null;
+                        }
+                    },
+                    onError: (errors) => {
+                        let pesan =
+                            "Terjadi kesalahan saat memperbarui foto profil.";
+                        if (errors && typeof errors === "object") {
+                            pesan = Object.values(errors).join("\n");
+                        }
+                        Swal.fire({
+                            icon: "error",
+                            title: "Gagal!",
+                            text: pesan,
+                        });
+                    },
+                });
+            }
+        });
+    };
+
     const handleSubmitUbahProfil = (e) => {
         e.preventDefault();
         const form = e.target;
@@ -382,14 +528,12 @@ export default function Profil() {
         }
     }, [form.new_password]);
 
-    // 🔹 Handle input perubahan
     const handleChangePassword = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    // 🔹 Validasi manual form
-    const validateForm = (formEl) => {
+    const validateFormPassword = () => {
         const required = [
             "current_password",
             "new_password",
@@ -403,7 +547,7 @@ export default function Profil() {
         e.preventDefault();
         const formEl = e.target;
 
-        if (!validateForm(formEl)) {
+        if (!validateFormPassword(formEl)) {
             Swal.fire({
                 icon: "error",
                 title: "Validasi Gagal!",
@@ -518,11 +662,15 @@ export default function Profil() {
                             <div className="card-body p-4 pb-0 position-relative">
                                 <div className="d-flex align-items-end justify-content-between flex-wrap">
                                     <div>
-                                        <span className="avatar avatar-xxl avatar-rounded bg-info online">
+                                        <span className="avatar avatar-xxl avatar-rounded bg-light-transparent online">
                                             <img
                                                 src={
-                                                    foto ||
-                                                    "/react/images/faces/21.jpg"
+                                                    foto_user?.filename
+                                                        ? foto_user?.filename.replace(
+                                                              "public/",
+                                                              "/storage/"
+                                                          )
+                                                        : "/react/images/faces/21.jpg"
                                                 }
                                                 alt=""
                                             />
@@ -1322,35 +1470,91 @@ export default function Profil() {
                                             <div className="row">
                                                 <div className="col-xl-12">
                                                     <div className="row">
-                                                        <div className="col-xl-4 mb-3">
+                                                        <div className="col-xl-4">
                                                             <label className="form-label fw-bold">
-                                                                Pengalaman Kerja
+                                                                Foto Profil
                                                             </label>
-                                                            <textarea
-                                                                id="pengalaman_kerja"
-                                                                name="pengalaman_kerja"
-                                                                rows="5"
-                                                                className="form-control"
-                                                                placeholder="e.g. Saya pernah bekerja pada suatu instansi swasta ternama bertempat di Kota X dan berprofesi sebagai X..."
-                                                                value={
-                                                                    data.pengalaman_kerja ||
-                                                                    ""
-                                                                }
-                                                                onChange={(e) =>
-                                                                    setData(
-                                                                        "pengalaman_kerja",
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                            ></textarea>
-                                                            {errors.pengalaman_kerja && (
-                                                                <div className="text-danger mt-1 small">
-                                                                    {
-                                                                        errors.pengalaman_kerja
-                                                                    }
+                                                            <div className="card custom-card">
+                                                                <div className="card-body">
+                                                                    <div className="d-flex flex-column gap-2">
+                                                                        {/* Baris atas: foto + input + tombol */}
+                                                                        <div className="d-flex align-items-center gap-3 flex-wrap">
+                                                                            <span className="avatar avatar-xxl">
+                                                                                <img
+                                                                                    src={
+                                                                                        preview
+                                                                                    }
+                                                                                    alt="Foto Profil"
+                                                                                />
+                                                                            </span>
+
+                                                                            <div className="d-flex flex-column">
+                                                                                <div className="d-flex align-items-center gap-2 flex-wrap">
+                                                                                    <input
+                                                                                        ref={
+                                                                                            fileInputRefFoto
+                                                                                        }
+                                                                                        type="file"
+                                                                                        accept="image/*"
+                                                                                        onChange={
+                                                                                            handleChangeFileFoto
+                                                                                        }
+                                                                                        className="form-control form-control-sm"
+                                                                                        style={{
+                                                                                            width: "auto",
+                                                                                        }}
+                                                                                    />
+
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn btn-sm btn-primary"
+                                                                                        onClick={
+                                                                                            handleSubmitUbahFotoProfil
+                                                                                        }
+                                                                                        disabled={
+                                                                                            !fileFoto
+                                                                                        }
+                                                                                    >
+                                                                                        <i className="ri-upload-2-line me-1"></i>{" "}
+                                                                                        Ganti
+                                                                                    </button>
+
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn btn-sm btn-light"
+                                                                                        onClick={
+                                                                                            handleHapusFoto
+                                                                                        }
+                                                                                        disabled={
+                                                                                            preview ===
+                                                                                            "/react/images/faces/21.jpg"
+                                                                                        }
+                                                                                    >
+                                                                                        <i className="ri-delete-bin-line me-1"></i>{" "}
+                                                                                        Hapus
+                                                                                    </button>
+                                                                                </div>
+
+                                                                                {/* Baris bawah: keterangan */}
+                                                                                <span className="d-block fs-12 text-muted mt-1">
+                                                                                    Ekstensi
+                                                                                    JPG
+                                                                                    /
+                                                                                    JPEG
+                                                                                    /
+                                                                                    PNG.
+                                                                                    Ukuran
+                                                                                    ideal
+                                                                                    200x200
+                                                                                    pixels.
+                                                                                    Maksimal
+                                                                                    3MB.
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                            )}
+                                                            </div>
                                                         </div>
                                                         <div className="col-xl-8">
                                                             <label
@@ -1445,6 +1649,34 @@ export default function Profil() {
                                                 </div>
 
                                                 <div className="col-xl-7">
+                                                    <label className="form-label fw-bold">
+                                                        Pengalaman Kerja
+                                                    </label>
+                                                    <textarea
+                                                        id="pengalaman_kerja"
+                                                        name="pengalaman_kerja"
+                                                        rows="5"
+                                                        className="form-control mb-3"
+                                                        placeholder="e.g. Saya pernah bekerja pada suatu instansi swasta ternama bertempat di Kota X dan berprofesi sebagai X..."
+                                                        value={
+                                                            data.pengalaman_kerja ||
+                                                            ""
+                                                        }
+                                                        onChange={(e) =>
+                                                            setData(
+                                                                "pengalaman_kerja",
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                    ></textarea>
+                                                    {errors.pengalaman_kerja && (
+                                                        <div className="text-danger mt-1 small">
+                                                            {
+                                                                errors.pengalaman_kerja
+                                                            }
+                                                        </div>
+                                                    )}
+
                                                     <label
                                                         htmlFor="pengalaman_kerja"
                                                         className="form-label fw-bold"
@@ -2544,7 +2776,12 @@ export default function Profil() {
 
                                                                     return (
                                                                         <div
-                                                                            className={nama !== 's3' ? 'mb-3 border-bottom pb-3' : ''}
+                                                                            className={
+                                                                                nama !==
+                                                                                "s3"
+                                                                                    ? "mb-3 border-bottom pb-3"
+                                                                                    : ""
+                                                                            }
                                                                             key={
                                                                                 nama
                                                                             }

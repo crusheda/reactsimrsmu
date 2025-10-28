@@ -31,6 +31,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'v4', 'as' => ''], function 
     // AKUN
     Route::get('profil', [ProfilController::class, 'index'])->name('v4.profil.index');
     Route::post('profil/store', [ProfilController::class, 'store'])->name('v4.profil.store');
+    Route::post('profil/ubahfoto', [ProfilController::class, 'ubahFoto'])->name('v4.profil.ubahFoto');
+    Route::delete('profil/hapusfoto', [ProfilController::class, 'hapusFoto'])->name('v4.profil.hapusFoto');
     Route::patch('profil/ubahpassword', [ProfilController::class, 'ubahPassword'])->name('v4.profil.ubahPassword');
 
     // PUBLIK

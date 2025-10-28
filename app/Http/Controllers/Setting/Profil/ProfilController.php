@@ -546,8 +546,6 @@ class ProfilController extends Controller
         die();
 
         file_put_contents('test.png', $data);
-        // print_r($request->all());
-        // die();
     }
 
     public function apiProvinsi($id)
