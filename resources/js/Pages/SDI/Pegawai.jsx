@@ -393,7 +393,7 @@ const Pegawai = () => {
                         </div>
                     </div>
 
-                    {/* Profil Card */}
+                    {/* Pegawai Card */}
                     <div className="col-sm-12">
                         <div className="card">
                             <div className="card-header d-flex align-items-center justify-content-between py-3">

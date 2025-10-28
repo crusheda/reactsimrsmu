@@ -37,7 +37,7 @@ export const validateForm = (formElement) => {
 
             const validFeedback = document.createElement("div");
             validFeedback.className = "valid-feedback";
-            validFeedback.innerText = "Data sesuai!";
+            // validFeedback.innerText = "Data sesuai!";
             input.parentElement.appendChild(validFeedback);
         } else {
             input.classList.remove("is-valid");

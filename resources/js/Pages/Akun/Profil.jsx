@@ -2,12 +2,12 @@ import MainLayout from "@/Layouts/MainLayout";
 import React, { useRef, useEffect, useState } from "react";
 import { Head, router, usePage, useForm, Link } from "@inertiajs/react";
 import { validateForm } from "@/Helpers/formValidation";
+import { initDataTable, initTooltips, showLoading } from "@/Helpers/Helper";
 
 export default function Profil() {
     // TAB UBAH PROFIL ------------------------------------------------------------------
     const [fileFoto, setFile] = useState(null);
     const { auth, list, flash } = usePage().props;
-    // const foto = list.foto;
     const user = list.user;
     const role = list.role;
     const foto_user = list.foto_user;
@@ -18,6 +18,21 @@ export default function Profil() {
             : "/react/images/faces/21.jpg"
     );
     const fileInputRefFoto = useRef(null);
+    useEffect(() => {
+        const lightbox = GLightbox({
+            selector: ".glightbox",
+            touchNavigation: true,
+            loop: true,
+            zoomable: true,
+            openEffect: "zoom",
+            closeEffect: "fade",
+        });
+
+        return () => {
+            lightbox.destroy(); // cleanup saat komponen unmount
+        };
+    }, []);
+
     // useEffect(() => {
     //     if (flash?.message) {
     //         Swal.fire({
@@ -29,6 +44,7 @@ export default function Profil() {
     //         });
     //     }
     // }, [flash]);
+
     const { data, setData, post, processing, errors } = useForm({
         pengalaman_kerja: list.user.pengalaman_kerja || "",
         gelar_depan: list.user.gelar_depan || "",
@@ -137,32 +153,32 @@ export default function Profil() {
     useEffect(() => {
         // Prefill KTP
         if (data.ktp_provinsi && listKota.length === 0) {
-            axios.get(`/api/provinsi/${data.ktp_provinsi}`).then((res) => {
+            axios.get(`/api/v4/provinsi/${data.ktp_provinsi}`).then((res) => {
                 setListKota(res.data);
             });
         }
 
         if (data.ktp_kabupaten && listKecamatan.length === 0) {
-            axios.get(`/api/kota/${data.ktp_kabupaten}`).then((res) => {
+            axios.get(`/api/v4/kota/${data.ktp_kabupaten}`).then((res) => {
                 setListKecamatan(res.data);
             });
         }
 
         if (data.ktp_kecamatan && listKelurahan.length === 0) {
-            axios.get(`/api/kecamatan/${data.ktp_kecamatan}`).then((res) => {
+            axios.get(`/api/v4/kecamatan/${data.ktp_kecamatan}`).then((res) => {
                 setListKelurahan(res.data);
             });
         }
 
         // Prefill DOMISILI
         if (data.dom_provinsi && listDomKota.length === 0) {
-            axios.get(`/api/provinsi/${data.dom_provinsi}`).then((res) => {
+            axios.get(`/api/v4/provinsi/${data.dom_provinsi}`).then((res) => {
                 setListDomKota(res.data);
             });
         }
 
         if (data.dom_kabupaten && listDomKecamatan.length === 0) {
-            axios.get(`/api/kota/${data.dom_kabupaten}`).then((res) => {
+            axios.get(`/api/v4/kota/${data.dom_kabupaten}`).then((res) => {
                 setListDomKecamatan(res.data);
             });
         }
@@ -174,13 +190,10 @@ export default function Profil() {
         }
     }, []);
 
-    // ====================
-    // REAKTIF SAAT ADA PERUBAHAN
-    // ====================
-    // ===================== ALAMAT KTP ===================== //
+    // ALAMAT KTP
     useEffect(() => {
         if (data.ktp_provinsi) {
-            axios.get(`/api/provinsi/${data.ktp_provinsi}`).then((res) => {
+            axios.get(`/api/v4/provinsi/${data.ktp_provinsi}`).then((res) => {
                 setListKota(res.data);
                 // hanya reset jika belum ada kabupaten terpilih
                 if (!data.ktp_kabupaten) {
@@ -198,7 +211,7 @@ export default function Profil() {
 
     useEffect(() => {
         if (data.ktp_kabupaten) {
-            axios.get(`/api/kota/${data.ktp_kabupaten}`).then((res) => {
+            axios.get(`/api/v4/kota/${data.ktp_kabupaten}`).then((res) => {
                 setListKecamatan(res.data);
                 if (!data.ktp_kecamatan) {
                     setData("ktp_kecamatan", "");
@@ -213,7 +226,7 @@ export default function Profil() {
 
     useEffect(() => {
         if (data.ktp_kecamatan) {
-            axios.get(`/api/kecamatan/${data.ktp_kecamatan}`).then((res) => {
+            axios.get(`/api/v4/kecamatan/${data.ktp_kecamatan}`).then((res) => {
                 setListKelurahan(res.data);
                 if (!data.ktp_kelurahan) {
                     setData("ktp_kelurahan", "");
@@ -224,10 +237,10 @@ export default function Profil() {
         }
     }, [data.ktp_kecamatan]);
 
-    // ===================== ALAMAT DOMISILI ===================== //
+    // ALAMAT DOMISILI
     useEffect(() => {
         if (data.dom_provinsi) {
-            axios.get(`/api/provinsi/${data.dom_provinsi}`).then((res) => {
+            axios.get(`/api/v4/provinsi/${data.dom_provinsi}`).then((res) => {
                 setListDomKota(res.data);
                 if (!data.dom_kabupaten) {
                     setData("dom_kabupaten", "");
@@ -244,7 +257,7 @@ export default function Profil() {
 
     useEffect(() => {
         if (data.dom_kabupaten) {
-            axios.get(`/api/kota/${data.dom_kabupaten}`).then((res) => {
+            axios.get(`/api/v4/kota/${data.dom_kabupaten}`).then((res) => {
                 setListDomKecamatan(res.data);
                 if (!data.dom_kecamatan) {
                     setData("dom_kecamatan", "");
@@ -259,7 +272,7 @@ export default function Profil() {
 
     useEffect(() => {
         if (data.dom_kecamatan) {
-            axios.get(`/api/kecamatan/${data.dom_kecamatan}`).then((res) => {
+            axios.get(`/api/v4/kecamatan/${data.dom_kecamatan}`).then((res) => {
                 setListDomKelurahan(res.data);
                 if (!data.dom_kelurahan) {
                     setData("dom_kelurahan", "");
@@ -283,6 +296,79 @@ export default function Profil() {
             }));
         }
     }, [data.cek_dom]);
+
+    const handleSubmitUbahProfil = (e) => {
+        e.preventDefault();
+        const form = e.target;
+
+        // 🔍 Jalankan validasi
+        const valid = validateForm(form);
+        if (!valid) {
+            Swal.fire({
+                icon: "error",
+                title: "Validasi Gagal!",
+                text: "Mohon lengkapi data yang belum sesuai.",
+            });
+            return;
+        }
+
+        const formData = new FormData();
+        Object.keys(data).forEach((key) => {
+            formData.append(key, data[key]);
+        });
+
+        const uploadFields = [
+            "sd",
+            "smp",
+            "sma",
+            "d2",
+            "d3",
+            "d4",
+            "s1",
+            "s1_profesi",
+            "s2",
+            "s3",
+        ];
+        uploadFields.forEach((field) => {
+            const fileInput = document.querySelector(`#upload_${field}`);
+            if (fileInput && fileInput.files[0]) {
+                formData.append(`upload_${field}`, fileInput.files[0]);
+            }
+        });
+
+        router.post("/v4/profil/store", formData, {
+            forceFormData: true,
+            preserveScroll: true,
+            onStart: () => {
+                Swal.fire({
+                    title: "Menyimpan...",
+                    text: "Data profil sedang diproses",
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+            },
+            onSuccess: () => {
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil!",
+                    text: "Profil berhasil diperbarui 🎉",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+            },
+            onError: (errors) => {
+                let pesan = "Terjadi kesalahan saat menyimpan data profil.";
+                if (errors && typeof errors === "object") {
+                    pesan = Object.values(errors).join("\n");
+                }
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal!",
+                    text: pesan,
+                });
+            },
+        });
+    };
 
     // TAB UBAH PROFIL x FOTO PROFIL ------------------------------------------------------------------
     const handleChangeFileFoto = (e) => {
@@ -412,79 +498,6 @@ export default function Profil() {
         });
     };
 
-    const handleSubmitUbahProfil = (e) => {
-        e.preventDefault();
-        const form = e.target;
-
-        // 🔍 Jalankan validasi
-        const valid = validateForm(form);
-        if (!valid) {
-            Swal.fire({
-                icon: "error",
-                title: "Validasi Gagal!",
-                text: "Mohon lengkapi data yang belum sesuai.",
-            });
-            return;
-        }
-
-        const formData = new FormData();
-        Object.keys(data).forEach((key) => {
-            formData.append(key, data[key]);
-        });
-
-        const uploadFields = [
-            "sd",
-            "smp",
-            "sma",
-            "d2",
-            "d3",
-            "d4",
-            "s1",
-            "s1_profesi",
-            "s2",
-            "s3",
-        ];
-        uploadFields.forEach((field) => {
-            const fileInput = document.querySelector(`#upload_${field}`);
-            if (fileInput && fileInput.files[0]) {
-                formData.append(`upload_${field}`, fileInput.files[0]);
-            }
-        });
-
-        router.post("/v4/profil/store", formData, {
-            forceFormData: true,
-            preserveScroll: true,
-            onStart: () => {
-                Swal.fire({
-                    title: "Menyimpan...",
-                    text: "Data profil sedang diproses",
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading(),
-                });
-            },
-            onSuccess: () => {
-                Swal.fire({
-                    icon: "success",
-                    title: "Berhasil!",
-                    text: "Profil berhasil diperbarui 🎉",
-                    timer: 2000,
-                    showConfirmButton: false,
-                });
-            },
-            onError: (errors) => {
-                let pesan = "Terjadi kesalahan saat menyimpan data profil.";
-                if (errors && typeof errors === "object") {
-                    pesan = Object.values(errors).join("\n");
-                }
-                Swal.fire({
-                    icon: "error",
-                    title: "Gagal!",
-                    text: pesan,
-                });
-            },
-        });
-    };
-
     // TAB UBAH PASSWORD ------------------------------------------------------------------
 
     const [form, setForm] = useState({
@@ -542,7 +555,6 @@ export default function Profil() {
         return required.every((field) => form[field]?.trim() !== "");
     };
 
-    // 🔹 Handle submit password
     const handleSubmitPassword = (e) => {
         e.preventDefault();
         const formEl = e.target;
@@ -622,6 +634,292 @@ export default function Profil() {
         );
     };
 
+    // TAB DOKUMEN ------------------------------------------------------------------
+    const switchStrRef = useRef();
+    const jenisRef = useRef();
+    const tglMulaiRef = useRef();
+    const tglAkhirRef = useRef();
+    const noSuratRef = useRef();
+    const deskripsiRef = useRef();
+    const uploadRef = useRef();
+
+    // const [tableLoaded, setTableLoaded] = useState(false);
+    const [loadingTabelDokumen, setLoadingTabelDokumen] = useState(false);
+    const [loadingSimpanDokumen, setLoadingSimpanDokumen] = useState(false);
+
+    // inisialisasi event handler seperti jQuery
+    useEffect(() => {
+        const switchStr = switchStrRef.current;
+        const jenis = jenisRef.current;
+        const tglMulai = tglMulaiRef.current;
+        const tglAkhir = tglAkhirRef.current;
+        const noSurat = noSuratRef.current;
+        const deskripsi = deskripsiRef.current;
+        const upload = uploadRef.current;
+
+        // event change jenis dokumen
+        const onJenisChange = () => {
+            switchStr.checked = false;
+            tglMulai.disabled = false;
+            tglAkhir.disabled = false;
+            noSurat.disabled = false;
+            deskripsi.disabled = false;
+            upload.disabled = false;
+
+            if (jenis.value == 139) {
+                switchStr.parentElement.parentElement.hidden = false;
+            } else {
+                switchStr.parentElement.parentElement.hidden = true;
+            }
+
+            if (jenis.value == 141 || jenis.value == 153) {
+                tglMulai.disabled = true;
+                noSurat.disabled = true;
+                deskripsi.disabled = true;
+            } else {
+                tglMulai.disabled = false;
+                noSurat.disabled = false;
+                deskripsi.disabled = false;
+            }
+        };
+
+        jenis.addEventListener("change", onJenisChange);
+
+        // event switch STR
+        const onSwitchChange = () => {
+            if (switchStr.checked) {
+                tglMulai.disabled = true;
+                tglAkhir.disabled = true;
+                deskripsi.disabled = true;
+            } else {
+                tglMulai.disabled = false;
+                tglAkhir.disabled = false;
+                deskripsi.disabled = false;
+            }
+        };
+        switchStr.addEventListener("change", onSwitchChange);
+
+        return () => {
+            jenis.removeEventListener("change", onJenisChange);
+            switchStr.removeEventListener("change", onSwitchChange);
+        };
+    }, []);
+
+    const prosesTambahDokumen = () => {
+        setLoadingSimpanDokumen(true);
+
+        const switchStr = switchStrRef.current;
+        const jenis = jenisRef.current.value;
+        const tglMulai = tglMulaiRef.current.value;
+        const tglAkhir = tglAkhirRef.current.value;
+        const noSurat = noSuratRef.current.value;
+        const deskripsi = deskripsiRef.current.value;
+        const filex = uploadRef.current.files.length;
+
+        let validasi = true;
+
+        if (jenis === "") {
+            validasi = false;
+        } else {
+            if (jenis == 139) {
+                if (switchStr.checked) {
+                    if (jenis === "" || noSurat === "" || filex === 0)
+                        validasi = false;
+                } else {
+                    if (
+                        jenis === "" ||
+                        tglMulai === "" ||
+                        tglAkhir === "" ||
+                        noSurat === "" ||
+                        filex === 0
+                    ) {
+                        validasi = false;
+                    } else if (tglMulai === tglAkhir) {
+                        validasi = false;
+                        iziToast.error({
+                            title: "Pesan Galat!",
+                            message:
+                                "Tanggal Mulai Berlaku tidak diperbolehkan sama dengan Tanggal Berakhir Surat",
+                            position: "topRight",
+                        });
+                    }
+                }
+            } else if (jenis == 141 || jenis == 153) {
+                if (jenis === "" || tglAkhir === "" || filex === 0)
+                    validasi = false;
+            } else {
+                if (
+                    jenis === "" ||
+                    tglMulai === "" ||
+                    tglAkhir === "" ||
+                    noSurat === "" ||
+                    filex === 0
+                ) {
+                    validasi = false;
+                } else if (tglMulai === tglAkhir) {
+                    validasi = false;
+                    iziToast.error({
+                        title: "Pesan Galat!",
+                        message:
+                            "Tanggal Mulai Berlaku tidak diperbolehkan sama dengan Tanggal Berakhir Surat",
+                        position: "topRight",
+                    });
+                }
+            }
+        }
+
+        if (!validasi) {
+            iziToast.warning({
+                title: "Pesan Ambigu!",
+                message:
+                    'Mohon lengkapi semua data (<span class="text-danger">*</span>) terlebih dahulu dan pastikan tidak ada yang kosong',
+                position: "topRight",
+            });
+            setLoadingSimpanDokumen(false);
+            return;
+        }
+
+        const fd = new FormData();
+        fd.append("file", uploadRef.current.files[0]);
+        fd.append("user_id", auth?.user?.id);
+        fd.append("jenis", jenis);
+        fd.append("tgl_mulai", tglMulai);
+        fd.append("tgl_akhir", tglAkhir);
+        fd.append("no_surat", noSurat);
+        fd.append("deskripsi", deskripsi);
+
+        axios
+            .post(`/api/v4/profil/dokumen/add`, fd, {
+                withCredentials: true,
+            })
+            .then((res) => {
+                iziToast.success({
+                    title: "Pesan Sukses!",
+                    message: `Dokumen berhasil ditambahkan pada ${res.data}`,
+                    position: "topRight",
+                });
+                refreshDokumen();
+            })
+            .catch((err) => {
+                console.log(err);
+                iziToast.error({
+                    title: "Pesan Galat!",
+                    message: "Proses upload Dokumen Gagal!",
+                    position: "topRight",
+                });
+            })
+            .finally(() => {
+                setLoadingSimpanDokumen(false);
+            });
+    };
+
+    const refreshDokumen = () => {
+        setLoadingTabelDokumen(true);
+        showLoading("#tampil-tbody-dokumen", 9);
+
+        const switchStr = switchStrRef.current;
+        const jenis = jenisRef.current;
+        const tglMulai = tglMulaiRef.current;
+        const tglAkhir = tglAkhirRef.current;
+        const noSurat = noSuratRef.current;
+        const deskripsi = deskripsiRef.current;
+        const upload = uploadRef.current;
+
+        switchStr.checked = false;
+        jenis.value = "";
+        tglMulai.value = "";
+        tglMulai.disabled = false;
+        tglAkhir.value = "";
+        tglAkhir.disabled = false;
+        noSurat.value = "";
+        noSurat.disabled = false;
+        deskripsi.value = "";
+        deskripsi.disabled = false;
+        upload.value = "";
+        upload.disabled = false;
+
+        // render table menggunakan AJAX
+        axios
+            .get(`/api/v4/profil/dokumen/table/${auth?.user?.id}`, {
+                withCredentials: true,
+            })
+            .then((res) => {
+                const data = res.data.show;
+                const tableBody = $("#tampil-tbody-dokumen");
+                if ($.fn.DataTable.isDataTable("#dttable-dokumen")) {
+                    $("#dttable-dokumen").DataTable().clear().destroy();
+                }
+                tableBody.empty();
+
+                data.forEach((item) => {
+                    let content = `<tr id='data${item.id}'>`;
+                    content += `<td><center><div class='dropend'><a href='javascript:void(0);' class='btn btn-light btn-sm text-muted font-size-16 rounded' data-bs-toggle='dropdown'><i class="ti ti-dots"></i></a><div class='dropdown-menu'>`;
+
+                    if (item.title) {
+                        content += `<a href='javascript:void(0);' class='dropdown-item text-primary' onclick="window.open('/v4/profil/dokumen/download/${item.id}')"><i class='fas fa-download me-1'></i> Download</a>`;
+                    } else {
+                        content += `<a href='javascript:void(0);' class='dropdown-item text-secondary' disabled><i class='fas fa-download me-1'></i> Download</a>`;
+                    }
+
+                    content += `</div></center></td>`;
+                    content += `<td>
+                        <h5 class="mb-0"><span class="badge me-1" style="font-size: 10px;${
+                            item.color ? "background-color:" + item.color : ""
+                        }">${item.nama_ref}</span> ${
+                        item.status
+                            ? item.no_surat
+                            : "<s>" + item.no_surat + "</s>"
+                    }</h5>`;
+                    if (!item.tgl_akhir) {
+                        if (item.ref_id == 139)
+                            content += `<p class="text-muted f-12 mb-0">Masa Berlaku <a class="text-primary">Seumur Hidup</a></p>`;
+                    } else {
+                        if (!item.tgl_mulai)
+                            content += `<p class="text-muted f-12 mb-0">${item.tgl_akhir}</p>`;
+                        else
+                            content += `<p class="text-muted f-12 mb-0">${item.tgl_mulai}&nbsp;<i class="ti ti-arrow-narrow-right text-primary"></i>&nbsp;${item.tgl_akhir}</p>`;
+                    }
+                    content += `</td><td style='white-space: normal !important;word-wrap: break-word;'>${
+                        item.deskripsi ?? "-"
+                    }</td>`;
+                    content += `<td><center>${
+                        item.status
+                            ? '<span class="badge bg-success">Aktif</span>'
+                            : '<span class="badge bg-danger">Nonaktif</span>'
+                    }</center></td>`;
+                    content += `<td>${new Date(item.updated_at).toLocaleString(
+                        "sv-SE"
+                    )}</td></tr>`;
+
+                    tableBody.append(content);
+                });
+                initTooltips(tableBody);
+                initDataTable("#dttable-dokumen", {
+                    orderCol: 4,
+                    sort: "desc",
+                    displayLength: 10,
+                    columnDefs: [
+                        { width: "5%", targets: 0 },
+                        { width: "30%", targets: 1 },
+                        { width: "40%", targets: 2 },
+                        { width: "10%", targets: 3 },
+                        { width: "15%", targets: 3 },
+                    ],
+                    enableExport: false,
+                });
+            })
+            .catch((err) => {
+                iziToast.error({
+                    title: "Pesan Galat!",
+                    message: "Proses memuat Data Gagal!",
+                    position: "topRight",
+                });
+            })
+            .finally(() => {
+                setLoadingTabelDokumen(false);
+            });
+    };
+
     return (
         <>
             <Head>
@@ -662,19 +960,34 @@ export default function Profil() {
                             <div className="card-body p-4 pb-0 position-relative">
                                 <div className="d-flex align-items-end justify-content-between flex-wrap">
                                     <div>
-                                        <span className="avatar avatar-xxl avatar-rounded bg-light-transparent online">
-                                            <img
-                                                src={
-                                                    foto_user?.filename
-                                                        ? foto_user?.filename.replace(
-                                                              "public/",
-                                                              "/storage/"
-                                                          )
-                                                        : "/react/images/faces/21.jpg"
-                                                }
-                                                alt=""
-                                            />
-                                        </span>
+                                        <a
+                                            href={
+                                                foto_user?.filename
+                                                    ? foto_user?.filename.replace(
+                                                          "public/",
+                                                          "/storage/"
+                                                      )
+                                                    : "/react/images/faces/21.jpg"
+                                            }
+                                            className="glightbox"
+                                            data-gallery="fotoProfil"
+                                            role="button"
+                                        >
+                                            <span className="avatar avatar-xxl avatar-rounded bg-light-transparent online">
+                                                {/* <img src="../assets/images/media/media-40.jpg" alt="image" class="img-fluid rounded"> */}
+                                                <img
+                                                    src={
+                                                        foto_user?.filename
+                                                            ? foto_user?.filename.replace(
+                                                                  "public/",
+                                                                  "/storage/"
+                                                              )
+                                                            : "/react/images/faces/21.jpg"
+                                                    }
+                                                    alt="Foto Profil"
+                                                />
+                                            </span>
+                                        </a>
                                         <div className="mt-4 mb-3 d-flex align-items-center flex-wrap gap-3 justify-content-between">
                                             <div>
                                                 <h5 className="fw-semibold mb-1">
@@ -816,8 +1129,31 @@ export default function Profil() {
                                                     role="tab"
                                                     aria-controls="dokumen-tab"
                                                     aria-selected="false"
+                                                    onClick={() =>
+                                                        refreshDokumen()
+                                                    }
                                                 >
                                                     Dokumen
+                                                </button>
+                                            </li>
+                                            <li
+                                                className="nav-item"
+                                                role="presentation"
+                                            >
+                                                <button
+                                                    className="nav-link"
+                                                    id=""
+                                                    data-bs-toggle="tab"
+                                                    data-bs-target="#spkrkk-tab"
+                                                    type="button"
+                                                    role="tab"
+                                                    aria-controls="spkrkk-tab"
+                                                    aria-selected="false"
+                                                    // onClick={() =>
+                                                    //     refreshDokumen()
+                                                    // }
+                                                >
+                                                    SPK & RKK
                                                 </button>
                                             </li>
                                         </ul>
@@ -1470,14 +1806,13 @@ export default function Profil() {
                                             <div className="row">
                                                 <div className="col-xl-12">
                                                     <div className="row">
-                                                        <div className="col-xl-4">
+                                                        <div className="col-xl-5">
                                                             <label className="form-label fw-bold">
                                                                 Foto Profil
                                                             </label>
-                                                            <div className="card custom-card">
+                                                            <div className="card mb-3">
                                                                 <div className="card-body">
                                                                     <div className="d-flex flex-column gap-2">
-                                                                        {/* Baris atas: foto + input + tombol */}
                                                                         <div className="d-flex align-items-center gap-3 flex-wrap">
                                                                             <span className="avatar avatar-xxl">
                                                                                 <img
@@ -1534,13 +1869,9 @@ export default function Profil() {
                                                                                         Hapus
                                                                                     </button>
                                                                                 </div>
-
-                                                                                {/* Baris bawah: keterangan */}
                                                                                 <span className="d-block fs-12 text-muted mt-1">
                                                                                     Ekstensi
                                                                                     JPG
-                                                                                    /
-                                                                                    JPEG
                                                                                     /
                                                                                     PNG.
                                                                                     Ukuran
@@ -1556,14 +1887,14 @@ export default function Profil() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="col-xl-8">
+                                                        <div className="col-xl-7">
                                                             <label
                                                                 htmlFor="pengalaman_kerja"
                                                                 className="form-label fw-bold"
                                                             >
                                                                 Data Sensitif
                                                             </label>
-                                                            <div className="card custom-card">
+                                                            <div className="card mb-3">
                                                                 <div className="card-body">
                                                                     <div className="row">
                                                                         <div className="col-sm-3 mb-3">
@@ -3210,15 +3541,282 @@ export default function Profil() {
                                             </b>
                                         </div>
                                         <div>
-                                            (
-                                            <span className="text-danger">
-                                                *
-                                            </span>
-                                            ) Wajib Diisi
+                                            <div className="btn-group">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-sm btn-warning-light btn-wave"
+                                                    onClick={() =>
+                                                        refreshDokumen()
+                                                    }
+                                                >
+                                                    <i
+                                                        className={`fas me-1 ${
+                                                            loadingTabelDokumen
+                                                                ? "fa-sync fa-spin"
+                                                                : "fa-sync"
+                                                        }`}
+                                                        data-bs-toggle="tooltip"
+                                                        title="Refresh Daftar Dokumen Upload"
+                                                    ></i>{" "}
+                                                    Refresh Tabel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="card-body pb-0">
+                                        <div className="d-flex align-items-center justify-content-between">
+                                            <h5 className="mb-0 flex-grow-1">
+                                                <a className="text-danger">*</a>
+                                                /x{" "}
+                                                <small>
+                                                    dokumen wajib sudah
+                                                    terupload.
+                                                </small>
+                                            </h5>
+                                            <div
+                                                className="flex-shrink-0"
+                                                id="switch-str"
+                                                hidden
+                                            >
+                                                <div className="form-check form-switch custom-switch-v1 switch-sm">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="form-check-input input-primary"
+                                                        id="checkboxseumurhidup"
+                                                        ref={switchStrRef}
+                                                    />
+                                                    <label
+                                                        className="form-check-label"
+                                                        htmlFor="checkboxseumurhidup"
+                                                    >
+                                                        Seumur Hidup ?
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr className="my-2" />
+                                        <div className="row">
+                                            <div className="col-md-3">
+                                                <div className="form-group mb-3">
+                                                    <label className="form-label">
+                                                        Jenis Surat{" "}
+                                                        <span className="text-danger">
+                                                            *
+                                                        </span>
+                                                    </label>
+                                                    <select
+                                                        className="form-control"
+                                                        id="jenis_dokumen"
+                                                        ref={jenisRef}
+                                                        defaultValue=""
+                                                    >
+                                                        <option value="" hidden>
+                                                            Pilih Jenis Surat
+                                                        </option>
+                                                        {list.ref_dokumen &&
+                                                            list.ref_dokumen.map(
+                                                                (item) => (
+                                                                    <option
+                                                                        key={
+                                                                            item.id
+                                                                        }
+                                                                        value={
+                                                                            item.id
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.deskripsi
+                                                                        }
+                                                                    </option>
+                                                                )
+                                                            )}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-3">
+                                                <div className="form-group mb-3">
+                                                    <label className="form-label">
+                                                        Tgl. Mulai Berlaku{" "}
+                                                        <span className="text-danger">
+                                                            *
+                                                        </span>
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        id="tgl_mulai_dokumen"
+                                                        ref={tglMulaiRef}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-3">
+                                                <div className="form-group mb-3">
+                                                    <label className="form-label">
+                                                        Tgl. Berakhir Surat{" "}
+                                                        <span className="text-danger">
+                                                            *
+                                                        </span>
+                                                    </label>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        id="tgl_akhir_dokumen"
+                                                        ref={tglAkhirRef}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-3">
+                                                <div className="form-group mb-3">
+                                                    <label className="form-label">
+                                                        Nomor Surat{" "}
+                                                        <span className="text-danger">
+                                                            *
+                                                        </span>
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        id="no_surat_dokumen"
+                                                        ref={noSuratRef}
+                                                        placeholder="e.g. III.l23213.AKBV"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-5">
+                                                <div className="form-group mb-3">
+                                                    <label className="form-label">
+                                                        Deskripsi
+                                                    </label>
+                                                    <textarea
+                                                        className="form-control"
+                                                        id="deskripsi_dokumen"
+                                                        placeholder="Tuliskan Keterangan (Optional)"
+                                                        rows={3}
+                                                        ref={deskripsiRef}
+                                                    ></textarea>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-7">
+                                                <div className="form-group mb-3 d-flex flex-column">
+                                                    <label className="form-label">
+                                                        Upload Dokumen{" "}
+                                                        <span className="text-danger">
+                                                            *
+                                                        </span>
+                                                    </label>
+                                                    <div className="row mb-2">
+                                                        <div className="col">
+                                                            <input
+                                                                type="file"
+                                                                className="form-control form-control-sm"
+                                                                id="upload_dokumen"
+                                                                accept="application/pdf"
+                                                                ref={uploadRef}
+                                                            />
+                                                        </div>
+                                                        <div className="col-auto">
+                                                            <button
+                                                                className="btn btn-primary"
+                                                                onClick={
+                                                                    prosesTambahDokumen
+                                                                }
+                                                                id="btn-upload-dokumen"
+                                                                disabled={
+                                                                    loadingSimpanDokumen
+                                                                }
+                                                            >
+                                                                <i
+                                                                    className={`fas me-1 ${
+                                                                        loadingSimpanDokumen
+                                                                            ? "fa-sync fa-spin"
+                                                                            : "fa-upload"
+                                                                    }`}
+                                                                ></i>{" "}
+                                                                Upload
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <span className="d-block fs-12 text-muted mt-1">
+                                                        Ekstensi Wajib{" "}
+                                                        <mark>PDF</mark>.
+                                                        Maksimal <b>2MB</b>.
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="card-body">
-                                        ini halaman Dokumen
+                                        <div className="table-responsive">
+                                            <table
+                                                className="table mb-0 table-hover text-nowrap w-100 dataTable no-footer"
+                                                id="dttable-dokumen"
+                                            >
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            <center>
+                                                                AKSI
+                                                            </center>
+                                                        </th>
+                                                        <th>DOKUMEN SURAT</th>
+                                                        <th>DESKRIPSI</th>
+                                                        <th>
+                                                            <center>
+                                                                STATUS
+                                                            </center>
+                                                        </th>
+                                                        <th className="text-end">
+                                                            TERAKHIR DIPERBARUI
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tampil-tbody-dokumen">
+                                                    <tr>
+                                                        <td
+                                                            colSpan="9"
+                                                            style={{
+                                                                fontSize:
+                                                                    "13px",
+                                                            }}
+                                                        >
+                                                            <center>
+                                                                <i className="fa fa-spinner fa-spin fa-fw"></i>{" "}
+                                                                Memproses
+                                                                data...
+                                                            </center>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                className="tab-pane p-0 border-0"
+                                id="spkrkk-tab"
+                                role="tabpanel"
+                                aria-labelledby="spkrkk-tab"
+                                tabIndex="0"
+                            >
+                                <div className="card custom-card">
+                                    <div className="card-header fw-bold justify-content-between">
+                                        <div>
+                                            Daftar Dokumen{" "}
+                                            <b className="text-indigo">
+                                                SPK
+                                            </b>{" "}&{" "}
+                                            <b className="text-info">
+                                                RKK
+                                            </b>
+                                        </div>
+                                        <div>
+                                            <div className="btn-group">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="card-body">
+                                        coming soon, as fast as i can.
                                     </div>
                                 </div>
                             </div>

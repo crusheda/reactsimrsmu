@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+// use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -34,6 +34,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'v4', 'as' => ''], function 
     Route::post('profil/ubahfoto', [ProfilController::class, 'ubahFoto'])->name('v4.profil.ubahFoto');
     Route::delete('profil/hapusfoto', [ProfilController::class, 'hapusFoto'])->name('v4.profil.hapusFoto');
     Route::patch('profil/ubahpassword', [ProfilController::class, 'ubahPassword'])->name('v4.profil.ubahPassword');
+    Route::get('profil/dokumen/download/{id}', [ProfilController::class, 'downloadDokumen'])->name('v4.profil.downloadDokumen');
 
     // PUBLIK
     Route::get('dashboard', [DashboardController::class, 'index'])->name('v4.dashboard');

@@ -22,6 +22,9 @@ window.axios = axios;
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 // iziToast
+import 'izitoast/dist/css/iziToast.min.css';
+import iziToast from 'izitoast';
+window.iziToast = iziToast;
 // import 'izitoast/dist/css/iziToast.min.css';
 // import 'izitoast/dist/js/iziToast.min.js';
 
@@ -66,11 +69,16 @@ import 'animate.css/animate.min.css';
 import feather from 'feather-icons';
 window.feather = feather;
 
+// Glightbox Gallery
+import 'glightbox/dist/css/glightbox.min.css';
+import GLightbox from 'glightbox';
+window.GLightbox = GLightbox;
+
 // Font Awesome (via npm) Versi terbaru
 // import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Izitoast
-import iziToast from "izitoast";
+// import iziToast from "izitoast";
 
 // Tambahan plugin lainnya (sesuai CSS lama kamu)
 // import 'notifier-js/dist/css/notifier.css'; // jika kamu pakai Notifier

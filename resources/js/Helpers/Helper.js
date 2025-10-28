@@ -43,7 +43,7 @@ export const initDataTable = (
         ],
         pageLength: displayLength,
         lengthChange: true,
-        lengthMenu: [10, 25, 50, 75, 100],
+        lengthMenu: [10, 25, 50, 75, 100, 300, 500, 1000, 3000, 5000, 10000],
         columnDefs,
         responsive: true,
         retrieve: true,
@@ -104,16 +104,17 @@ export const showLoading = (tbodyId, colspan) => {
 // Tooltip Helper Function
 // -----------------------------------------------------------
 export const initTooltips = (parent = document) => {
+    if (!parent || !parent.querySelectorAll) return; // <-- safety check
     const tooltipTriggerList = [].slice.call(
         parent.querySelectorAll('[data-bs-toggle="tooltip"]')
     );
     tooltipTriggerList.forEach(el => {
-        // Hapus instance lama kalau ada
         const existing = bootstrap.Tooltip.getInstance(el);
         if (existing) existing.dispose();
         new bootstrap.Tooltip(el);
     });
 };
+
 // export const initDropdowns = () => {
 //     const dropdownTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="dropdown"]'));
 //     dropdownTriggerList.forEach((el) => {

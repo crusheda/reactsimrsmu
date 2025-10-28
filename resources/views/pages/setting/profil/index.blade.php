@@ -974,11 +974,11 @@
                         <div class="card-header d-flex align-items-center justify-content-between py-3">
                             <h5 class="mb-0 card-title flex-grow-1">Penyimpanan Dokumen</h5>
                             <div class="flex-shrink-0">
-                                {{-- <div class="btn-group">
+                                <div class="btn-group">
                                     <button type="button" class="btn btn-link-warning" id="btn-refresh"
                                     data-bs-toggle="tooltip" data-bs-offset="0,4" data-bs-placement="bottom" data-bs-html="true" title="Refresh Tabel Dokumen" onclick="refreshDokumen()">
                                         <i class="fa-fw fas fa-sync nav-icon me-1"></i>Segarkan</button>
-                                </div> --}}
+                                </div>
                             </div>
                         </div>
                         <div class="card-body p-b-0 p-3">
@@ -1064,10 +1064,6 @@
                                 </table>
                             </div>
                         </div>
-                        {{-- <div class="card-footer text-end btn-page">
-                            <div class="btn btn-link-danger">Cancel</div>
-                            <div class="btn btn-primary">Update Profile</div>
-                        </div> --}}
                     </div>
                 </div>
 

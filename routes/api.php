@@ -21,9 +21,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware(['web','auth:sanctum'])->group(function () {
+    Route::get('v4/provinsi/{id}', [ProfilController::class, 'apiProvinsi']);
+    Route::get('v4/kota/{id}', [ProfilController::class, 'apiKota']);
+    Route::get('v4/kecamatan/{id}', [ProfilController::class, 'apiKecamatan']);
+    Route::get('v4/profil/dokumen/table/{id}', [ProfilController::class, 'tableDokumen']);
+    Route::post('v4/profil/dokumen/add', [ProfilController::class, 'tambahDokumen']);
+    Route::post('v4/profil/dokumen/ubah/{id}/proses', [ProfilController::class, 'ubahDokumen']);
+    Route::delete('v4/profil/dokumen/hapus/{id}/proses', [ProfilController::class, 'hapusDokumen']);
+    Route::get('v4/profil/dokumen/ubah/{id}', [ProfilController::class, 'showUbahDokumen']);
+    Route::get('v4/profil/spkrkk/table/{id}', [ProfilController::class, 'tableSpkrkk']);
+});
+
 // Route::group(['middleware' => ['auth']], function () {
     // PROFIL
     // Route::post('profil/fotoprofil', '\App\Http\Controllers\Setting\Profil\ProfilController@storeBlobImg');
+
     Route::get('provinsi/{id}', '\App\Http\Controllers\Setting\Profil\ProfilController@apiProvinsi');
     Route::get('kota/{id}', '\App\Http\Controllers\Setting\Profil\ProfilController@apiKota');
     Route::get('kecamatan/{id}', '\App\Http\Controllers\Setting\Profil\ProfilController@apiKecamatan');

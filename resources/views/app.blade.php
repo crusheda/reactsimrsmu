@@ -127,6 +127,9 @@
     <!-- Auto Complete CSS -->
     <link rel="stylesheet" href="{{ asset('react/libs/%40tarekraafat/autocomplete.js/css/autoComplete.css') }}">
 
+    <!-- Glightbox CSS -->
+    {{-- <link rel="stylesheet" href="{{ asset('react/libs/glightbox/css/glightbox.min.css') }}"> --}}
+
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap.min.css">
@@ -256,6 +259,9 @@
     <!-- Sales Dashboard -->
     {{-- <script src="{{ asset('react/js/sales-dashboard.js') }}"></script> --}}
 
+    <!-- Glightbox JS -->
+    {{-- <script src="{{ asset('react/libs/glightbox/js/glightbox.min.js') }}"></script> --}}
+
     <!-- Custom JS -->
     {{-- <script src="{{ asset('react/js/custom.js') }}"></script> --}}
     <script src="{{ asset('react/js/custom-react.js') }}"></script>
@@ -303,7 +309,14 @@
     {{-- TEMPLATE LAMA  ---------------------------------------------------------------------------------------- --}}
     <script>
         $(document).ready(function() {
+            // const lightboxVideo1 = GLightbox({
+            //     selector: '.glightbox'
+            // });
 
+            // lightboxVideo1.on('slide_changed', ({ prev, current }) => {
+            //     const { slideIndex, slideNode, slideConfig, player } = current;
+            //     // You can use these variables if needed
+            // });
         });
     </script>
 </body>
