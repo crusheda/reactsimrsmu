@@ -529,7 +529,119 @@ const Pegawai = () => {
                                     id="table2"
                                     hidden
                                 >
-                                    {/* Copy table lengkap dari Blade di sini */}
+                        <table id="dttable-all" className="table align-middle dt-responsive table-hover nowrap w-100">
+                            <thead>
+                                <tr>
+                                    <th className="cell-fit">ID</th>
+                                    <th>NIP</th>
+                                    <th>NIK</th>
+                                    <th>USERNAME</th>
+                                    <th>NAMA LENGKAP</th>
+                                    <th>PANGGILAN</th>
+                                    <th>TMPT/TGL LAHIR</th>
+                                    <th>JENIS KELAMIN</th>
+                                    <th>STATUS KAWIN</th>
+                                    <th>STATUS PEGAWAI</th>
+                                    <th>JABATAN</th>
+                                    <th>KLASIFIKASI</th>
+                                    <th>MASUK KERJA</th>
+                                    <th>URUTAN MASUK</th>
+                                    <th>TMT</th>
+                                    <th>TAT</th>
+                                    <th>NO.HP</th>
+                                    <th>EMAIL</th>
+                                    <th>FB</th>
+                                    <th>IG</th>
+                                    <th>TT</th>
+                                    <th>KELURAHAN (KTP)</th>
+                                    <th>KECAMATAN (KTP)</th>
+                                    <th>KABUPATEN (KTP)</th>
+                                    <th>PROVINSI (KTP)</th>
+                                    <th className="cell-fit">ALAMAT (KTP)</th>
+                                    <th>KELURAHAN (DOM)</th>
+                                    <th>KECAMATAN (DOM)</th>
+                                    <th>KABUPATEN (DOM)</th>
+                                    <th>PROVINSI (DOM)</th>
+                                    <th className="cell-fit">ALAMAT (DOM)</th>
+                                    <th>SD</th>
+                                    <th>SMP</th>
+                                    <th>SMA</th>
+                                    <th>D1</th>
+                                    <th>D2</th>
+                                    <th>D3</th>
+                                    <th>D4</th>
+                                    <th>S1</th>
+                                    <th>S1 PROFESI</th>
+                                    <th>S2</th>
+                                    <th>S3</th>
+                                    <th className="cell-fit">PENGALAMAN KERJA</th>
+                                    <th>RIWAYAT PENYAKIT</th>
+                                    <th>RIWAYAT PENYAKIT KELUARGA</th>
+                                    <th>RIWAYAT OPERASI</th>
+                                    <th>RIWAYAT PENGGUNAAN OBAT</th>
+                                    <th className="cell-fit">UPDATE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tampil-tbody-all">
+                                <tr>
+                                    <td colSpan="9">
+                                        <center><i className="fa fa-spinner fa-spin fa-fw"></i> Memproses data...</center>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th className="cell-fit">ID</th>
+                                    <th>NIP</th>
+                                    <th>NIK</th>
+                                    <th>USERNAME</th>
+                                    <th>NAMA LENGKAP</th>
+                                    <th>PANGGILAN</th>
+                                    <th>TMPT/TGL LAHIR</th>
+                                    <th>JENIS KELAMIN</th>
+                                    <th>STATUS KAWIN</th>
+                                    <th>STATUS PEGAWAI</th>
+                                    <th>JABATAN</th>
+                                    <th>KLASIFIKASI</th>
+                                    <th>MASUK KERJA</th>
+                                    <th>URUTAN MASUK</th>
+                                    <th>TMT</th>
+                                    <th>TAT</th>
+                                    <th>NO.HP</th>
+                                    <th>EMAIL</th>
+                                    <th>FB</th>
+                                    <th>IG</th>
+                                    <th>TT</th>
+                                    <th>KELURAHAN (KTP)</th>
+                                    <th>KECAMATAN (KTP)</th>
+                                    <th>KABUPATEN (KTP)</th>
+                                    <th>PROVINSI (KTP)</th>
+                                    <th className="cell-fit">ALAMAT (KTP)</th>
+                                    <th>KELURAHAN (DOM)</th>
+                                    <th>KECAMATAN (DOM)</th>
+                                    <th>KABUPATEN (DOM)</th>
+                                    <th>PROVINSI (DOM)</th>
+                                    <th className="cell-fit">ALAMAT (DOM)</th>
+                                    <th>SD</th>
+                                    <th>SMP</th>
+                                    <th>SMA</th>
+                                    <th>D1</th>
+                                    <th>D2</th>
+                                    <th>D3</th>
+                                    <th>D4</th>
+                                    <th>S1</th>
+                                    <th>S1 PROFESI</th>
+                                    <th>S2</th>
+                                    <th>S3</th>
+                                    <th className="cell-fit">PENGALAMAN KERJA</th>
+                                    <th>RIWAYAT PENYAKIT</th>
+                                    <th>RIWAYAT PENYAKIT KELUARGA</th>
+                                    <th>RIWAYAT OPERASI</th>
+                                    <th>RIWAYAT PENGGUNAAN OBAT</th>
+                                    <th className="cell-fit">UPDATE</th>
+                                </tr>
+                            </tfoot>
+                        </table>
                                 </div>
                             </div>
                         </div>

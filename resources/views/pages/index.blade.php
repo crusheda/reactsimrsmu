@@ -71,9 +71,9 @@
 
                         <li class="nav-item">
                             @auth
-                                <a class="btn btn-light-secondary shadow" href="{{ route('dashboard') }}"><i class="ti ti-home me-1"></i> Dashboard</a>
+                                <a class="btn btn-light-secondary shadow" href="{{ route('v4.dashboard') }}"><i class="ti ti-home me-1"></i> Dashboard</a>
                             @else
-                                <a class="btn btn-light-primary shadow" href="{{ route('login') }}"><i class="ti ti-login me-1"></i> Login</a>
+                                <a class="btn btn-light-primary shadow" href="{{ route('v4.login') }}"><i class="ti ti-login me-1"></i> Login</a>
                             @endauth
                         </li>
                     </ul>
@@ -105,12 +105,12 @@
                             <div class="dropdown d-inline-block">
                                 <a class="btn btn-light-primary dropdown-toggle arrow-none d-inline-flex align-items-center" data-bs-toggle="dropdown" href="#">Menu <i class="ti ti-chevron-down ms-1"></i></a>
                                 <div class="dropdown-menu drp-technology drp-tech-scrollble">
-                                    <a class="dropdown-item gap-2" href="{{ route('dashboard') }}"><i class="ti ti-home me-1"></i> Dashboard</a>
+                                    <a class="dropdown-item gap-2" href="{{ route('v4.dashboard') }}"><i class="ti ti-home me-1"></i> Dashboard</a>
                                     <a class="dropdown-item gap-2" href="javascript:void(0);" onclick="event.preventDefault(); document.getElementById('logoutform').submit();"><i class="ti ti-logout me-1"></i> Logout</a>
                                 </div>
                             </div>
                         @else
-                            <a class="btn btn-light-primary shadow" href="{{ route('login') }}"><i class="ti ti-login me-1"></i> Masuk / Login</a>
+                            <a class="btn btn-light-primary shadow" href="{{ route('v4.login') }}"><i class="ti ti-login me-1"></i> Masuk / Login</a>
                         @endauth
                     </div>
                     <div class="row g-5 justify-content-center text-center wow fadeInUp" data-wow-delay="0.5s">
