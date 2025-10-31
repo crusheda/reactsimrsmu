@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 // INITIALIZE
 use App\Http\Controllers\React\Akun\ProfilController;
+use App\Http\Controllers\React\SDI\PegawaiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,8 @@ Route::middleware(['web','auth:sanctum'])->group(function () {
     Route::delete('v4/profil/dokumen/hapus/{id}/proses', [ProfilController::class, 'hapusDokumen']);
     Route::get('v4/profil/dokumen/ubah/{id}', [ProfilController::class, 'showUbahDokumen']);
     Route::get('v4/profil/spkrkk/table/{id}', [ProfilController::class, 'tableSpkrkk']);
+    Route::get('v4/sdi/pegawai/table', [PegawaiController::class, 'table'])->name('tablePegawai');
+    Route::get('v4/sdi/pegawai/tableall', [PegawaiController::class, 'tableAll'])->name('tablePegawaiAll');
 });
 
 // Route::group(['middleware' => ['auth']], function () {

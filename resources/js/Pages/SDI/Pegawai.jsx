@@ -11,6 +11,7 @@ const Pegawai = () => {
 
     // Loading state
     const [loadingTabelSimpel, setLoadingTabelSimpel] = useState(false);
+    const [loadingTabelLengkap, setLoadingTabelLengkap] = useState(false);
 
     // Ref untuk grafik
     const grafikRef = useRef(null);
@@ -19,11 +20,13 @@ const Pegawai = () => {
 
     // ============ AJAX FUNCTIONS ==============
     const refresh = () => {
+        $("#table2").attr("hidden", true);
+        $("#table1").removeAttr("hidden");
         // Table simpel
         setLoadingTabelSimpel(true);
         showLoading("#tampil-tbody", 9);
         $.ajax({
-            url: "/api/profilkaryawan/table",
+            url: "/api/v4/sdi/pegawai/table",
             type: "GET",
             dataType: "json",
             success: (res) => {
@@ -90,26 +93,138 @@ const Pegawai = () => {
         $("#table1").attr("hidden", true);
         $("#table2").removeAttr("hidden");
         // Table lengkap
+        setLoadingTabelLengkap(true);
         showLoading("#tampil-tbody-all", 20);
         $.ajax({
-            url: "/profilkaryawan/tableall",
+            url: "/api/v4/sdi/pegawai/tableall",
             type: "GET",
             dataType: "json",
             success: (res) => {
+                if ($.fn.DataTable.isDataTable("#dttable-all")) {
+                    $("#dttable-all").DataTable().clear().destroy();
+                }
                 $("#tampil-tbody-all").empty();
+                let content = "";
+                let pNama = "";
                 res.show.forEach((item) => {
-                    $("#tampil-tbody-all").append(`
-            <tr>
-              <td>${item.id}</td>
-              <td>${item.nip}</td>
-              <td>${item.nik}</td>
-              <td>${item.nama_lengkap}</td>
-              <!-- Tambahkan kolom lain sesuai data -->
-              <td>${item.updated_at}</td>
-            </tr>
-          `);
+                    content += "<tr id='data" + item.id + "'>";
+                    content += `<td><center><div class='btn-group'>
+                                        <button class="btn btn-sm btn-outline-light btn-wave dropdown-toggle ${item.nik?'text-primary':'text-danger'}" type="button" data-bs-toggle="dropdown"
+                                            data-bs-auto-close="true" aria-expanded="false">${item.id}</button>
+                                    <ul class='dropdown-menu dropdown-menu-right'>`;
+                        content += `<li><a href="/kepegawaian/profilkaryawan/${item.id}" class='dropdown-item text-primary'><i class="fa-fw fas fa-search nav-icon me-1"></i> Lihat Profil</a></li>`;
+                    content += `</div></center></td>`;
+                    content += `<td>${item.nip?item.nip:'-'}</td>`;
+                    content += `<td>${item.nik?item.nik:'-'}</td>`;
+                    content += `<td>${item.name}</td>`;
+                    if (item.nama_lengkap) {
+                        pNama = item.nama_lengkap;
+                    } else {
+                        if (item.nama) {
+                            pNama = item.nama;
+                        } else {
+                            pNama = '-';
+                        }
+                    }
+                    content += `<td>${pNama}</td>`;
+                    content += `<td>${item.nick?item.nick:'-'}</td>`;
+                    content += `<td>${item.temp_lahir?item.temp_lahir:'-'}${item.tgl_lahir?', '+item.tgl_lahir:''}</td>`;
+                    content += `<td>${item.jns_kelamin?item.jns_kelamin:'-'}</td>`;
+                    content += `<td>${item.status_kawin?item.status_kawin:'-'}</td>`;
+                    content += `<td>${item.status_pegawai?item.status_pegawai:'-'}</td>`;
+                    content += `<td>`;
+                    res.role.forEach((val) => {
+                        if (item.id == val.id_user) {
+                            content += "<span class='badge bg-light-secondary'>" + val.nama_role + "</span>";
+                        }
+                    })
+                    content += `</td>`;
+                    content += `<td>${item.klasifikasi_user?item.klasifikasi_user:'-'}</td>`;
+                    content += `<td>${item.masuk_kerja?item.masuk_kerja:'-'}</td>`;
+                    content += `<td>${item.urutan_masuk?item.urutan_masuk:'-'}</td>`;
+                    content += `<td>${item.tmt?item.tmt:'-'}</td>`;
+                    content += `<td>${item.tat?item.tat:'-'}</td>`;
+                    content += `<td>${item.no_hp?item.no_hp:'-'}</td>`;
+                    content += `<td>${item.email?item.email:'-'}</td>`;
+                    content += `<td>${item.fb?item.fb:'-'}</td>`;
+                    content += `<td>${item.ig?item.ig:'-'}</td>`;
+                    content += `<td>${item.tt?item.tt:'-'}</td>`;
+                    content += `<td>${item.ktp_kelurahan?item.ktp_kelurahan:'-'}</td>`;
+                    content += `<td>${item.ktp_kecamatan?item.ktp_kecamatan:'-'}</td>`;
+                    content += `<td>${item.ktp_kabupaten?item.ktp_kabupaten:'-'}</td>`;
+                    content += `<td>${item.ktp_provinsi?item.ktp_provinsi:'-'}</td>`;
+                    content += `<td>${item.alamat_ktp?item.alamat_ktp:'-'}</td>`;
+                    content += `<td>${item.dom_kelurahan?item.dom_kelurahan:'-'}</td>`;
+                    content += `<td>${item.dom_kecamatan?item.dom_kecamatan:'-'}</td>`;
+                    content += `<td>${item.dom_kabupaten?item.dom_kabupaten:'-'}</td>`;
+                    content += `<td>${item.dom_provinsi?item.dom_provinsi:'-'}</td>`;
+                    content += `<td>${item.alamat_dom?item.alamat_dom:'-'}</td>`;
+                    content += `<td>${item.sd?item.sd:'-'} ${item.th_sd?' ('+item.th_sd+')':''}</td>`;
+                    content += `<td>${item.smp?item.smp:'-'} ${item.th_smp?' ('+item.th_smp+')':''}</td>`;
+                    content += `<td>${item.sma?item.sma:'-'} ${item.th_sma?' ('+item.th_sma+')':''}</td>`;
+                    content += `<td>${item.d1?item.d1:'-'} ${item.th_d1?' ('+item.th_d1+')':''}</td>`;
+                    content += `<td>${item.d2?item.d2:'-'} ${item.th_d2?' ('+item.th_d2+')':''}</td>`;
+                    content += `<td>${item.d3?item.d3:'-'} ${item.th_d3?' ('+item.th_d3+')':''}</td>`;
+                    content += `<td>${item.d4?item.d4:'-'} ${item.th_d4?' ('+item.th_d4+')':''}</td>`;
+                    content += `<td>${item.s1?item.s1:'-'} ${item.th_s1?' ('+item.th_s1+')':''}</td>`;
+                    content += `<td>${item.s1_profesi?item.s1_profesi:'-'} ${item.th_s1_profesi?' ('+item.th_s1_profesi+')':''}</td>`;
+                    content += `<td>${item.s2?item.s2:'-'} ${item.th_s2?' ('+item.th_s2+')':''}</td>`;
+                    content += `<td>${item.s3?item.s3:'-'} ${item.th_s3?' ('+item.th_s3+')':''}</td>`;
+                    content += `<td>${item.pengalaman_kerja?item.pengalaman_kerja:'-'}</td>`;
+                    content += `<td>${item.riwayat_penyakit?item.riwayat_penyakit:'-'}</td>`;
+                    content += `<td>${item.riwayat_penyakit_keluarga?item.riwayat_penyakit_keluarga:'-'}</td>`;
+                    content += `<td>${item.riwayat_operasi?item.riwayat_operasi:'-'}</td>`;
+                    content += `<td>${item.riwayat_penggunaan_obat?item.riwayat_penggunaan_obat:'-'}</td>`;
+                    content += '<td>' + new Date(item.updated_at).toLocaleString("sv-SE") + '</td>';
+                    content += `</tr>`;
+                })
+                $('#tampil-tbody-all').append(content);
+                initTooltips(document.querySelector("#tampil-tbody-all"));
+                initDataTable("#dttable-all", {
+                    orderCol: 47,
+                    sort: "desc",
+                    displayLength: 20,
+                    columnDefs: [
+                        { visible: false, targets: [5] },
+                        { visible: false, targets: [7] },
+                        { visible: false, targets: [8] },
+                        { visible: false, targets: [11] },
+                        { visible: false, targets: [12] },
+                        { visible: false, targets: [13] },
+                        { visible: false, targets: [14] },
+                        { visible: false, targets: [15] },
+                        { visible: false, targets: [17] },
+                        { visible: false, targets: [18] },
+                        { visible: false, targets: [19] },
+                        { visible: false, targets: [20] },
+                        { visible: false, targets: [21] },
+                        { visible: false, targets: [22] },
+                        { visible: false, targets: [23] },
+                        { visible: false, targets: [24] },
+                        { visible: false, targets: [26] },
+                        { visible: false, targets: [27] },
+                        { visible: false, targets: [28] },
+                        { visible: false, targets: [29] },
+                        { visible: false, targets: [30] },
+                        { visible: false, targets: [31] },
+                        { visible: false, targets: [32] },
+                        { visible: false, targets: [33] },
+                        { visible: false, targets: [34] },
+                        { visible: false, targets: [35] },
+                        { visible: false, targets: [36] },
+                        { visible: false, targets: [37] },
+                        { visible: false, targets: [38] },
+                        { visible: false, targets: [39] },
+                        { visible: false, targets: [40] },
+                        { visible: false, targets: [41] },
+                        { visible: false, targets: [42] },
+                        { visible: false, targets: [43] },
+                        { visible: false, targets: [44] },
+                        { visible: false, targets: [45] },
+                        { visible: false, targets: [46] },
+                    ],
+                    enableExport: true,
                 });
-                initDataTable("#dttable-all", 0, 20);
             },
             error: () => {
                 iziToast.error({
@@ -118,34 +233,68 @@ const Pegawai = () => {
                     position: "topRight",
                 });
             },
+            complete: () => {
+                setLoadingTabelLengkap(false);
+            },
         });
     };
 
     const refreshNonAktif = () => {
         showLoading("#tampil-tbody-nonaktif", 9);
         $.ajax({
-            url: "/profilkaryawan/nonaktif",
+            url: "/api/profilkaryawan/nonaktif",
             type: "GET",
             dataType: "json",
             success: (res) => {
+                if ($.fn.DataTable.isDataTable("#dttable-nonaktif")) {
+                    $("#dttable-nonaktif").DataTable().clear().destroy();
+                }
                 $("#tampil-tbody-nonaktif").empty();
                 res.show.forEach((item) => {
+                    let urlShow = `/kepegawaian/profilkaryawan/${item.id}`;
+                    let pNama = '';
+                    if (item.nama_lengkap) {
+                        pNama = item.nama_lengkap;
+                    } else {
+                        if (item.nama) {
+                            pNama = item.nama;
+                        } else {
+                            pNama = '-';
+                        }
+                    }
                     $("#tampil-tbody-nonaktif").append(`
-            <tr>
-              <td><center>${item.id}</center></td>
-              <td>${item.name}</td>
-              <td>${item.nama_lengkap}</td>
-              <td>${item.tgl_nonaktif}</td>
-              <td><button class="btn btn-sm btn-primary">Aktifkan</button></td>
-            </tr>
-          `);
+                        <tr>
+                            <td><center>${item.id}</center></td>
+                            <td>${item.name}</td>
+                            <td>${pNama}</td>
+                            <td>${new Date(item.deleted_at).toLocaleString("sv-SE")}</td>
+                            <td>
+                                <center>
+                                    <div class='btn-group'>
+                                        <a href="${urlShow}" class='btn btn-sm btn-info-light'>
+                                            <i class='fa-fw fas fa-file-archive nav-icon'></i> Lihat Profil
+                                        </a>
+                                        <a href='javascript:void(0);' class='btn btn-sm btn-success-light' onclick="showAktifKaryawan(${item.id})">
+                                            <i class='fa-fw fas fa-user-check nav-icon'></i> Aktifkan
+                                        </a>
+                                    </div>
+                                </center>
+                            </td>
+                        </tr>
+                    `);
                 });
-                initDataTable("#dttable-nonaktif", 3, 7);
+                initDataTable("#dttable-nonaktif", {
+                    orderCol: 3,
+                    sort: "desc",
+                    displayLength: 10,
+                    columnDefs: [],
+                    enableExport: false,
+                });
             },
             error: () => {
                 iziToast.error({
                     title: "Pesan Galat!",
-                    message: "Proses memuat Data Nonaktif Gagal!",
+                    message: "Proses memuat Data Pegawai Nonaktif Gagal!",
                     position: "topRight",
                 });
             },
@@ -155,26 +304,35 @@ const Pegawai = () => {
     const refreshNonLengkap = () => {
         showLoading("#tampil-tbody-nonlengkap", 9);
         $.ajax({
-            url: "/profilkaryawan/nonlengkap",
+            url: "/api/profilkaryawan/nonlengkap",
             type: "GET",
             dataType: "json",
             success: (res) => {
+                if ($.fn.DataTable.isDataTable("#dttable-nonlengkap")) {
+                    $("#dttable-nonlengkap").DataTable().clear().destroy();
+                }
                 $("#tampil-tbody-nonlengkap").empty();
                 res.show.forEach((item) => {
                     $("#tampil-tbody-nonlengkap").append(`
-            <tr>
-              <td><center>${item.id}</center></td>
-              <td>${item.name}</td>
-              <td>${item.dibuat}</td>
-            </tr>
-          `);
+                        <tr>
+                            <td><center>${item.id}</center></td>
+                            <td>${item.name}</td>
+                            <td>${new Date(item.created_at).toLocaleString("sv-SE")}</td>
+                        </tr>
+                    `);
                 });
-                initDataTable("#dttable-nonlengkap", 2, 7);
+                initDataTable("#dttable-nonlengkap", {
+                    orderCol: 2,
+                    sort: "desc",
+                    displayLength: 10,
+                    columnDefs: [],
+                    enableExport: false,
+                });
             },
             error: () => {
                 iziToast.error({
                     title: "Pesan Galat!",
-                    message: "Proses memuat Data Nonlengkap Gagal!",
+                    message: "Proses memuat Data Profil Pegawai Yang Tidak lengkap Gagal!",
                     position: "topRight",
                 });
             },
@@ -277,10 +435,19 @@ const Pegawai = () => {
 
                 <div className="page-header-breadcrumb mb-3">
                     <div className="d-flex align-center justify-content-between flex-wrap">
-                        <h1 className="page-title fw-medium fs-18 mb-0">Table Pegawai <b className="text-primary">RS</b></h1>
+                        <h1 className="page-title fw-medium fs-18 mb-0">
+                            Table Pegawai <b className="text-primary">RS</b>
+                        </h1>
                         <ol className="breadcrumb mb-0">
-                            <li className="breadcrumb-item"><a role="button">SDI</a></li>
-                            <li className="breadcrumb-item active" aria-current="page">Daftar Pegawai</li>
+                            <li className="breadcrumb-item">
+                                <a role="button">SDI</a>
+                            </li>
+                            <li
+                                className="breadcrumb-item active"
+                                aria-current="page"
+                            >
+                                Daftar Pegawai
+                            </li>
                         </ol>
                     </div>
                 </div>
@@ -401,7 +568,8 @@ const Pegawai = () => {
                                     <button
                                         className="btn btn-primary btn-wave"
                                         onClick={() =>
-                                            (window.location.href = "/akunpengguna")
+                                            (window.location.href =
+                                                "/akunpengguna")
                                         }
                                         data-bs-toggle="tooltip"
                                         title="Pengaturan Akun Pegawai"
@@ -418,7 +586,13 @@ const Pegawai = () => {
                                         data-bs-toggle="tooltip"
                                         title="Menampilkan Data Simpel Pegawai"
                                     >
-                                        <i className={`fas me-1 ${loadingTabelSimpel ? "fa-sync fa-spin" : "fa-sync"}`}></i>
+                                        <i
+                                            className={`fas me-1 ${
+                                                loadingTabelSimpel
+                                                    ? "fa-sync fa-spin"
+                                                    : "fa-sync"
+                                            }`}
+                                        ></i>
                                         Tabel Simpel
                                     </button>
 
@@ -429,7 +603,12 @@ const Pegawai = () => {
                                         data-bs-toggle="tooltip"
                                         title="Menampilkan Seluruh Data Profil Pegawai"
                                     >
-                                        <i className="fa-fw fas fa-infinity nav-icon me-1"></i>{" "}
+                                        <i
+                                            className={`fas me-1 ${
+                                                loadingTabelLengkap
+                                                    ? "fa-sync fa-spin"
+                                                    : "fa-infinity"
+                                            }`}></i>{" "}
                                         Tabel Lengkap
                                     </button>
                                 </div>
@@ -437,10 +616,16 @@ const Pegawai = () => {
                                 <div className="">
                                     <button
                                         className="btn btn-sm btn-outline-primary shadow-sm btn-wave"
-                                        data-bs-toggle="dropdown" data-bs-auto-close="true" type="button"
+                                        data-bs-toggle="dropdown"
+                                        data-bs-auto-close="true"
+                                        type="button"
                                         onClick={() => {}}
                                     >
-                                        <i className="ti ti-dots-vertical f-18" data-bs-toggle="tooltip" title="Pilihan Menu Lainnya"></i>
+                                        <i
+                                            className="ti ti-dots-vertical f-18"
+                                            data-bs-toggle="tooltip"
+                                            title="Pilihan Menu Lainnya"
+                                        ></i>
                                     </button>
                                     <ul className="dropdown-menu">
                                         <li>
@@ -471,8 +656,8 @@ const Pegawai = () => {
                                 <div className="alert alert-light shadow-sm">
                                     <small>
                                         <i className="fa-fw fas fa-caret-right nav-icon me-1"></i>{" "}
-                                        Refresh browser Anda apabila terjadi Error
-                                        saat pengambilan data karyawan
+                                        Refresh browser Anda apabila terjadi
+                                        Error saat pengambilan data karyawan
                                     </small>
                                     <br />
                                     <small>
@@ -486,7 +671,7 @@ const Pegawai = () => {
                                 </div>
 
                                 {/* Table Simpel */}
-                                <div className="table-responsive">
+                                <div className="table-responsive" id="table1">
                                     <table
                                         id="dttable"
                                         className="table table-hover text-nowrap w-100 dataTable no-footer"
@@ -529,119 +714,145 @@ const Pegawai = () => {
                                     id="table2"
                                     hidden
                                 >
-                        <table id="dttable-all" className="table align-middle dt-responsive table-hover nowrap w-100">
-                            <thead>
-                                <tr>
-                                    <th className="cell-fit">ID</th>
-                                    <th>NIP</th>
-                                    <th>NIK</th>
-                                    <th>USERNAME</th>
-                                    <th>NAMA LENGKAP</th>
-                                    <th>PANGGILAN</th>
-                                    <th>TMPT/TGL LAHIR</th>
-                                    <th>JENIS KELAMIN</th>
-                                    <th>STATUS KAWIN</th>
-                                    <th>STATUS PEGAWAI</th>
-                                    <th>JABATAN</th>
-                                    <th>KLASIFIKASI</th>
-                                    <th>MASUK KERJA</th>
-                                    <th>URUTAN MASUK</th>
-                                    <th>TMT</th>
-                                    <th>TAT</th>
-                                    <th>NO.HP</th>
-                                    <th>EMAIL</th>
-                                    <th>FB</th>
-                                    <th>IG</th>
-                                    <th>TT</th>
-                                    <th>KELURAHAN (KTP)</th>
-                                    <th>KECAMATAN (KTP)</th>
-                                    <th>KABUPATEN (KTP)</th>
-                                    <th>PROVINSI (KTP)</th>
-                                    <th className="cell-fit">ALAMAT (KTP)</th>
-                                    <th>KELURAHAN (DOM)</th>
-                                    <th>KECAMATAN (DOM)</th>
-                                    <th>KABUPATEN (DOM)</th>
-                                    <th>PROVINSI (DOM)</th>
-                                    <th className="cell-fit">ALAMAT (DOM)</th>
-                                    <th>SD</th>
-                                    <th>SMP</th>
-                                    <th>SMA</th>
-                                    <th>D1</th>
-                                    <th>D2</th>
-                                    <th>D3</th>
-                                    <th>D4</th>
-                                    <th>S1</th>
-                                    <th>S1 PROFESI</th>
-                                    <th>S2</th>
-                                    <th>S3</th>
-                                    <th className="cell-fit">PENGALAMAN KERJA</th>
-                                    <th>RIWAYAT PENYAKIT</th>
-                                    <th>RIWAYAT PENYAKIT KELUARGA</th>
-                                    <th>RIWAYAT OPERASI</th>
-                                    <th>RIWAYAT PENGGUNAAN OBAT</th>
-                                    <th className="cell-fit">UPDATE</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tampil-tbody-all">
-                                <tr>
-                                    <td colSpan="9">
-                                        <center><i className="fa fa-spinner fa-spin fa-fw"></i> Memproses data...</center>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th className="cell-fit">ID</th>
-                                    <th>NIP</th>
-                                    <th>NIK</th>
-                                    <th>USERNAME</th>
-                                    <th>NAMA LENGKAP</th>
-                                    <th>PANGGILAN</th>
-                                    <th>TMPT/TGL LAHIR</th>
-                                    <th>JENIS KELAMIN</th>
-                                    <th>STATUS KAWIN</th>
-                                    <th>STATUS PEGAWAI</th>
-                                    <th>JABATAN</th>
-                                    <th>KLASIFIKASI</th>
-                                    <th>MASUK KERJA</th>
-                                    <th>URUTAN MASUK</th>
-                                    <th>TMT</th>
-                                    <th>TAT</th>
-                                    <th>NO.HP</th>
-                                    <th>EMAIL</th>
-                                    <th>FB</th>
-                                    <th>IG</th>
-                                    <th>TT</th>
-                                    <th>KELURAHAN (KTP)</th>
-                                    <th>KECAMATAN (KTP)</th>
-                                    <th>KABUPATEN (KTP)</th>
-                                    <th>PROVINSI (KTP)</th>
-                                    <th className="cell-fit">ALAMAT (KTP)</th>
-                                    <th>KELURAHAN (DOM)</th>
-                                    <th>KECAMATAN (DOM)</th>
-                                    <th>KABUPATEN (DOM)</th>
-                                    <th>PROVINSI (DOM)</th>
-                                    <th className="cell-fit">ALAMAT (DOM)</th>
-                                    <th>SD</th>
-                                    <th>SMP</th>
-                                    <th>SMA</th>
-                                    <th>D1</th>
-                                    <th>D2</th>
-                                    <th>D3</th>
-                                    <th>D4</th>
-                                    <th>S1</th>
-                                    <th>S1 PROFESI</th>
-                                    <th>S2</th>
-                                    <th>S3</th>
-                                    <th className="cell-fit">PENGALAMAN KERJA</th>
-                                    <th>RIWAYAT PENYAKIT</th>
-                                    <th>RIWAYAT PENYAKIT KELUARGA</th>
-                                    <th>RIWAYAT OPERASI</th>
-                                    <th>RIWAYAT PENGGUNAAN OBAT</th>
-                                    <th className="cell-fit">UPDATE</th>
-                                </tr>
-                            </tfoot>
-                        </table>
+                                    <table
+                                        id="dttable-all"
+                                        className="table align-middle dt-responsive table-hover nowrap w-100"
+                                    >
+                                        <thead>
+                                            <tr>
+                                                <th className="cell-fit">ID</th>
+                                                <th>NIP</th>
+                                                <th>NIK</th>
+                                                <th>USERNAME</th>
+                                                <th>NAMA LENGKAP</th>
+                                                <th>PANGGILAN</th>
+                                                <th>TMPT/TGL LAHIR</th>
+                                                <th>JENIS KELAMIN</th>
+                                                <th>STATUS KAWIN</th>
+                                                <th>STATUS PEGAWAI</th>
+                                                <th>JABATAN</th>
+                                                <th>KLASIFIKASI</th>
+                                                <th>MASUK KERJA</th>
+                                                <th>URUTAN MASUK</th>
+                                                <th>TMT</th>
+                                                <th>TAT</th>
+                                                <th>NO.HP</th>
+                                                <th>EMAIL</th>
+                                                <th>FB</th>
+                                                <th>IG</th>
+                                                <th>TT</th>
+                                                <th>KELURAHAN (KTP)</th>
+                                                <th>KECAMATAN (KTP)</th>
+                                                <th>KABUPATEN (KTP)</th>
+                                                <th>PROVINSI (KTP)</th>
+                                                <th className="cell-fit">
+                                                    ALAMAT (KTP)
+                                                </th>
+                                                <th>KELURAHAN (DOM)</th>
+                                                <th>KECAMATAN (DOM)</th>
+                                                <th>KABUPATEN (DOM)</th>
+                                                <th>PROVINSI (DOM)</th>
+                                                <th className="cell-fit">
+                                                    ALAMAT (DOM)
+                                                </th>
+                                                <th>SD</th>
+                                                <th>SMP</th>
+                                                <th>SMA</th>
+                                                <th>D1</th>
+                                                <th>D2</th>
+                                                <th>D3</th>
+                                                <th>D4</th>
+                                                <th>S1</th>
+                                                <th>S1 PROFESI</th>
+                                                <th>S2</th>
+                                                <th>S3</th>
+                                                <th className="cell-fit">
+                                                    PENGALAMAN KERJA
+                                                </th>
+                                                <th>RIWAYAT PENYAKIT</th>
+                                                <th>
+                                                    RIWAYAT PENYAKIT KELUARGA
+                                                </th>
+                                                <th>RIWAYAT OPERASI</th>
+                                                <th>RIWAYAT PENGGUNAAN OBAT</th>
+                                                <th className="cell-fit">
+                                                    UPDATE
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tampil-tbody-all">
+                                            <tr>
+                                                <td colSpan="9">
+                                                    <center>
+                                                        <i className="fa fa-spinner fa-spin fa-fw"></i>{" "}
+                                                        Memproses data...
+                                                    </center>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th className="cell-fit">ID</th>
+                                                <th>NIP</th>
+                                                <th>NIK</th>
+                                                <th>USERNAME</th>
+                                                <th>NAMA LENGKAP</th>
+                                                <th>PANGGILAN</th>
+                                                <th>TMPT/TGL LAHIR</th>
+                                                <th>JENIS KELAMIN</th>
+                                                <th>STATUS KAWIN</th>
+                                                <th>STATUS PEGAWAI</th>
+                                                <th>JABATAN</th>
+                                                <th>KLASIFIKASI</th>
+                                                <th>MASUK KERJA</th>
+                                                <th>URUTAN MASUK</th>
+                                                <th>TMT</th>
+                                                <th>TAT</th>
+                                                <th>NO.HP</th>
+                                                <th>EMAIL</th>
+                                                <th>FB</th>
+                                                <th>IG</th>
+                                                <th>TT</th>
+                                                <th>KELURAHAN (KTP)</th>
+                                                <th>KECAMATAN (KTP)</th>
+                                                <th>KABUPATEN (KTP)</th>
+                                                <th>PROVINSI (KTP)</th>
+                                                <th className="cell-fit">
+                                                    ALAMAT (KTP)
+                                                </th>
+                                                <th>KELURAHAN (DOM)</th>
+                                                <th>KECAMATAN (DOM)</th>
+                                                <th>KABUPATEN (DOM)</th>
+                                                <th>PROVINSI (DOM)</th>
+                                                <th className="cell-fit">
+                                                    ALAMAT (DOM)
+                                                </th>
+                                                <th>SD</th>
+                                                <th>SMP</th>
+                                                <th>SMA</th>
+                                                <th>D1</th>
+                                                <th>D2</th>
+                                                <th>D3</th>
+                                                <th>D4</th>
+                                                <th>S1</th>
+                                                <th>S1 PROFESI</th>
+                                                <th>S2</th>
+                                                <th>S3</th>
+                                                <th className="cell-fit">
+                                                    PENGALAMAN KERJA
+                                                </th>
+                                                <th>RIWAYAT PENYAKIT</th>
+                                                <th>
+                                                    RIWAYAT PENYAKIT KELUARGA
+                                                </th>
+                                                <th>RIWAYAT OPERASI</th>
+                                                <th>RIWAYAT PENGGUNAAN OBAT</th>
+                                                <th className="cell-fit">
+                                                    UPDATE
+                                                </th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -699,7 +910,9 @@ const Pegawai = () => {
                                                 <tr>
                                                     <td
                                                         colSpan="9"
-                                                        style={{ fontSize: "13px" }}
+                                                        style={{
+                                                            fontSize: "13px",
+                                                        }}
                                                     >
                                                         <center>
                                                             <i className="fa fa-spinner fa-spin fa-fw"></i>{" "}
@@ -780,7 +993,9 @@ const Pegawai = () => {
                                                 <tr>
                                                     <td
                                                         colSpan="9"
-                                                        style={{ fontSize: "13px" }}
+                                                        style={{
+                                                            fontSize: "13px",
+                                                        }}
                                                     >
                                                         <center>
                                                             <i className="fa fa-spinner fa-spin fa-fw"></i>{" "}
@@ -837,10 +1052,11 @@ const Pegawai = () => {
                                         Anda akan mengaktifkan kembali karyawan
                                         dengan{" "}
                                         <kbd>
-                                            ID : <a id="show_id_aktif_karyawan"></a>
+                                            ID :{" "}
+                                            <a id="show_id_aktif_karyawan"></a>
                                         </kbd>{" "}
-                                        dan/apabila melanjutkan proses Submit, data
-                                        Anda akan tercatat dalam database.
+                                        dan/apabila melanjutkan proses Submit,
+                                        data Anda akan tercatat dalam database.
                                     </p>
                                     <label className="switch">
                                         <input
@@ -873,7 +1089,9 @@ const Pegawai = () => {
                                     <button
                                         type="reset"
                                         className="btn btn-outline-secondary"
-                                        onClick={() => setShowAktifKaryawan(false)}
+                                        onClick={() =>
+                                            setShowAktifKaryawan(false)
+                                        }
                                     >
                                         <i
                                             className="fa fa-times me-1"

@@ -82,6 +82,12 @@ export const initDataTable = (
                 extend: 'print',
                 text: '<i class="fas fa-print me-1"></i> Print',
                 className: 'btn btn-info-light btn-sm'
+            },
+            {
+                extend: 'colvis',
+                text: '<i class="fas fa-eye me-1"></i> Kolom',
+                className: 'btn btn-primary-light btn-sm',
+                postfixButtons: ['colvisRestore'] // tombol untuk reset visibilitas (opsional)
             }
         ];
     }
