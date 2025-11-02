@@ -31,7 +31,7 @@ class PegawaiController extends Controller
     {
         return Inertia::render('SDI/Pegawai');
     }
-    
+
     function table()
     {
         $show = users::where('status',null)->orderBy('updated_at','desc')->get();
@@ -70,5 +70,292 @@ class PegawaiController extends Controller
         ];
 
         return response()->json($data, 200);
+    }
+
+    function setAktif($id)
+    {
+        $tgl = Carbon::now()->isoFormat('dddd, D MMMM Y, HH:mm a');
+        $user = Auth::user()->id;
+
+        // $data = DB::table('users')->where('id',$id)->first();
+        $data = users::onlyTrashed()->where('id',$id)->first();
+        $data->status = null;
+        $data->user_hapus = null;
+        $data->deleted_at = null;
+        $data->save();
+
+        // CEK DATA & SAVE LOG
+        datalogs::record($user, 'Baru saja mengaktifkan status Login Pegawai ID : '.$id, null, null, null, '["kepala-sumber-daya-insani","staf-sumber-daya-insani"]');
+
+        return response()->json($tgl, 200);
+    }
+
+    // GRAFIK
+    public function grafik1() // Jenis Pegawai (ref_profesi -> referensi.ref_jenis = 11)
+    {
+        $data = DB::table('referensi')
+            ->select('referensi.id', 'referensi.deskripsi', DB::raw('COUNT(users.id) as total'))
+            ->leftJoin('users', 'users.ref_profesi', '=', 'referensi.id')
+            ->where('referensi.ref_jenis', 11)
+            ->whereNull('users.deleted_at')
+            ->groupBy('referensi.id', 'referensi.deskripsi')
+            ->get();
+
+        $belumMasuk = DB::table('users')
+            ->whereNull('ref_profesi')
+            ->whereNull('deleted_at')
+            ->count();
+
+        return response()->json([
+            'refid' => $data->pluck('id'),
+            'labels' => $data->pluck('deskripsi'),
+            'series' => $data->pluck('total'),
+            'belumMasuk' => $belumMasuk,
+        ]);
+    }
+
+    public function grafik2() // Jenis Kelamin
+    {
+        $data = DB::table('users')
+            ->select('jns_kelamin', DB::raw('COUNT(id) as total'))
+            ->whereNull('deleted_at')
+            ->groupBy('jns_kelamin')
+            ->get();
+
+        $labels = [];
+        $series = [];
+        $refid  = [];
+
+        foreach ($data as $row) {
+            $label = $row->jns_kelamin ?: 'BELUM DIISI';
+            $labels[] = $label;
+            $series[] = $row->total;
+            $refid[]  = $row->jns_kelamin ?: 0;
+        }
+
+        $belumMasuk = DB::table('users')->whereNull('jns_kelamin')->whereNull('deleted_at')->count();
+
+        return response()->json([
+            'refid' => $refid,
+            'labels' => $labels,
+            'series' => $series,
+            'belumMasuk' => $belumMasuk,
+        ]);
+    }
+
+    public function grafik3()
+    {
+        $data = DB::table('users')
+            ->select(DB::raw("
+                CASE
+                    WHEN (users.s3 IS NOT NULL AND users.s3 <> '') OR (users.th_s3 IS NOT NULL AND users.th_s3 <> '') THEN 'S3'
+                    WHEN (users.s2 IS NOT NULL AND users.s2 <> '') OR (users.th_s2 IS NOT NULL AND users.th_s2 <> '') THEN 'S2'
+                    WHEN (users.s1_profesi IS NOT NULL AND users.s1_profesi <> '') OR (users.th_s1_profesi IS NOT NULL AND users.th_s1_profesi <> '') THEN 'S1 Profesi'
+                    WHEN (users.s1 IS NOT NULL AND users.s1 <> '') OR (users.th_s1 IS NOT NULL AND users.th_s1 <> '') THEN 'S1'
+                    WHEN (users.d4 IS NOT NULL AND users.d4 <> '') OR (users.th_d4 IS NOT NULL AND users.th_d4 <> '') THEN 'D4'
+                    WHEN (users.d3 IS NOT NULL AND users.d3 <> '') OR (users.th_d3 IS NOT NULL AND users.th_d3 <> '') THEN 'D3'
+                    WHEN (users.d2 IS NOT NULL AND users.d2 <> '') OR (users.th_d2 IS NOT NULL AND users.th_d2 <> '') THEN 'D2'
+                    WHEN (users.d1 IS NOT NULL AND users.d1 <> '') OR (users.th_d1 IS NOT NULL AND users.th_d1 <> '') THEN 'D1'
+                    WHEN (users.sma IS NOT NULL AND users.sma <> '') OR (users.th_sma IS NOT NULL AND users.th_sma <> '') THEN 'SMA'
+                    WHEN (users.smp IS NOT NULL AND users.smp <> '') OR (users.th_smp IS NOT NULL AND users.th_smp <> '') THEN 'SMP'
+                    WHEN (users.sd IS NOT NULL AND users.sd <> '') OR (users.th_sd IS NOT NULL AND users.th_sd <> '') THEN 'SD'
+                    ELSE 'Belum Terisi'
+                END as pendidikan,
+                COUNT(*) as total
+            "))
+            ->whereNull('users.deleted_at')
+            ->groupBy('pendidikan')
+            ->orderByRaw("FIELD(pendidikan, 'SD','SMP','SMA','D1','D2','D3','D4','S1','S1 Profesi','S2','S3','Belum Terisi')")
+            ->get();
+
+        $labels = $data->pluck('pendidikan');
+        $series = $data->pluck('total');
+
+        // hitung khusus untuk "Belum Terisi"
+        $belumMasuk = DB::table('users')
+            ->whereNull('deleted_at')
+            ->where(function($q) {
+                $q->where(function($sub) {
+                    $sub->whereNull('s3')->orWhere('s3','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_s3')->orWhere('th_s3','');
+                })
+                ->where(function($sub) {
+                    $sub->whereNull('s2')->orWhere('s2','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_s2')->orWhere('th_s2','');
+                })
+                ->where(function($sub) {
+                    $sub->whereNull('s1_profesi')->orWhere('s1_profesi','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_s1_profesi')->orWhere('th_s1_profesi','');
+                })
+                ->where(function($sub) {
+                    $sub->whereNull('s1')->orWhere('s1','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_s1')->orWhere('th_s1','');
+                })
+                ->where(function($sub) {
+                    $sub->whereNull('d4')->orWhere('d4','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_d4')->orWhere('th_d4','');
+                })
+                ->where(function($sub) {
+                    $sub->whereNull('d3')->orWhere('d3','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_d3')->orWhere('th_d3','');
+                })
+                ->where(function($sub) {
+                    $sub->whereNull('d2')->orWhere('d2','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_d2')->orWhere('th_d2','');
+                })
+                ->where(function($sub) {
+                    $sub->whereNull('d1')->orWhere('d1','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_d1')->orWhere('th_d1','');
+                })
+                ->where(function($sub) {
+                    $sub->whereNull('sma')->orWhere('sma','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_sma')->orWhere('th_sma','');
+                })
+                ->where(function($sub) {
+                    $sub->whereNull('smp')->orWhere('smp','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_smp')->orWhere('th_smp','');
+                })
+                ->where(function($sub) {
+                    $sub->whereNull('sd')->orWhere('sd','');
+                })->where(function($sub) {
+                    $sub->whereNull('th_sd')->orWhere('th_sd','');
+                });
+            })
+            ->count();
+
+        return response()->json([
+            'refid' => $labels,
+            'labels' => $labels,
+            'series' => $series,
+            'belumMasuk' => $belumMasuk
+        ]);
+    }
+
+    public function grafik4()
+    {
+        $data = DB::table('referensi')
+            ->select(
+                DB::raw("
+                    CASE
+                        WHEN referensi.deskripsi LIKE 'Kepala Bagian%' THEN 'Kepala Bagian'
+                        WHEN referensi.deskripsi LIKE 'Kepala Sub Bagian%' THEN 'Kepala Sub Bagian'
+                        WHEN referensi.deskripsi LIKE 'Koordinator%' THEN 'Koordinator'
+                        WHEN referensi.deskripsi LIKE 'Sekretaris Direktur%' THEN 'Sekretaris Direktur'
+                        WHEN referensi.deskripsi LIKE 'Direktur%' THEN 'Direksi'
+                        WHEN referensi.deskripsi LIKE 'Manajer Pelayanan%' THEN 'Manajer Pelayanan'
+                        WHEN referensi.deskripsi LIKE 'Manajer Penunjang%' THEN 'Manajer Penunjang'
+                        WHEN referensi.deskripsi LIKE 'Kepala Ruang%' THEN 'Kepala Ruang'
+                        WHEN referensi.deskripsi IN ('Dokter','Dokter Umum','Dokter Spesialis') THEN 'Dokter'
+                        WHEN referensi.deskripsi IN ('PPI','Tim PMKP','Tim Asuransi','SPI','Ketua Tim Asuransi') THEN 'TIM'
+                        WHEN referensi.deskripsi LIKE 'Staff%' THEN 'Staf'
+                        ELSE referensi.deskripsi
+                    END as kategori,
+                    GROUP_CONCAT(DISTINCT(referensi.id)) as refid,
+                    COUNT(users.id) as total
+                ")
+            )
+            ->leftJoin('users', 'users.ref_subprofesi', '=', 'referensi.id')
+            ->where('referensi.ref_jenis', 14)
+            ->whereNull('users.deleted_at')
+            ->groupBy('kategori')
+            ->orderBy('kategori')
+            ->get();
+
+        $belumMasuk = DB::table('users')
+            ->whereNull('ref_subprofesi')
+            ->whereNull('deleted_at')
+            ->count();
+
+        return response()->json([
+            'refid' => $data->pluck('refid'),
+            'labels' => $data->pluck('kategori'),
+            'series' => $data->pluck('total'),
+            'belumMasuk' => $belumMasuk,
+        ]);
+    }
+
+    function grafik5()
+    {
+        $data = DB::table('referensi')
+            ->select(
+                'referensi.id',
+                'referensi.deskripsi',
+                DB::raw('COUNT(users.id) as total')
+            )
+            ->leftJoin('users_status', function($join) {
+                $join->on('referensi.id', '=', 'users_status.ref_id')
+                        ->where('users_status.status', 1)
+                        ->where('users_status.deleted_at',null);
+            })
+            ->leftJoin('users','users_status.pegawai_id', '=', 'users.id')
+            // ->leftJoin('users', function($join) {
+            //     $join->on('users_status.pegawai_id', '=', 'users.id')
+            //             ->where('users.status', null)
+            //             ->where('users.deleted_at',null);
+            // })
+            ->where('referensi.ref_jenis', 10)
+            ->groupBy('referensi.id', 'referensi.deskripsi')
+            ->get();
+
+        $belumMasuk = DB::table('users')
+            ->leftJoin('users_status', function($join) {
+                $join->on('users.id', '=', 'users_status.pegawai_id')
+                    ->where('users_status.status', 1)
+                    ->whereNull('users_status.deleted_at');
+            })
+            ->whereNull('users_status.id') // belum ada di users_status
+            ->whereNull('users.deleted_at') // user aktif
+            ->count('users.id');
+
+        // Format agar mudah dipakai ApexCharts
+        $refid = $data->pluck('id');
+        $labels = $data->pluck('deskripsi');
+        $series = $data->pluck('total');
+
+        return response()->json([
+            'refid' => $refid,
+            'labels' => $labels,
+            'series' => $series,
+            'belumMasuk' => $belumMasuk,
+        ]);
+    }
+
+    public function grafik6() // Status Perkawinan
+    {
+        $data = DB::table('users')
+            ->select('status_kawin', DB::raw('COUNT(id) as total'))
+            ->whereNull('deleted_at')
+            ->groupBy('status_kawin')
+            ->get();
+
+        $labels = [];
+        $series = [];
+        $refid  = [];
+
+        foreach ($data as $row) {
+            $label = $row->status_kawin ?: 'BELUM DIISI';
+            $labels[] = $label;
+            $series[] = $row->total;
+            $refid[]  = $row->status_kawin ?: 0;
+        }
+
+        $belumMasuk = DB::table('users')->whereNull('status_kawin')->whereNull('deleted_at')->count();
+
+        return response()->json([
+            'refid' => $refid,
+            'labels' => $labels,
+            'series' => $series,
+            'belumMasuk' => $belumMasuk,
+        ]);
     }
 }

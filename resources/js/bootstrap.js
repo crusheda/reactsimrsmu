@@ -15,6 +15,7 @@ window.$ = window.jQuery = $;
 
 // ApexCharts
 import ApexCharts from "apexcharts";
+window.ApexCharts = ApexCharts;
 
 // Axios
 import axios from 'axios';

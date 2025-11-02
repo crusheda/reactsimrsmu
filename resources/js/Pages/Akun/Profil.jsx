@@ -992,7 +992,7 @@ export default function Profil() {
                                             <div>
                                                 <h5 className="fw-semibold mb-1">
                                                     {user?.nama ? (
-                                                        <>{auth.user.nama}</>
+                                                        <>{user.nama}</>
                                                     ) : (
                                                         <>
                                                             {user?.name}{" "}

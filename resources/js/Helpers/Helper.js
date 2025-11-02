@@ -43,7 +43,7 @@ export const initDataTable = (
         ],
         pageLength: displayLength,
         lengthChange: true,
-        lengthMenu: [10, 25, 50, 75, 100, 300, 500, 1000, 3000, 5000, 10000],
+        lengthMenu: [10, 20, 25, 30, 35, 50, 75, 100, 300, 500, 1000, 3000, 5000, 10000],
         columnDefs,
         responsive: true,
         retrieve: true,

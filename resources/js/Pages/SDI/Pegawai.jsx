@@ -1,17 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import MainLayout from "@/Layouts/MainLayout";
 import { initDataTable, initTooltips, showLoading } from "@/Helpers/Helper";
 
 const Pegawai = () => {
     // Modal state
-    const [showNonAktif, setShowNonAktif] = useState(false);
-    const [showNonLengkap, setShowNonLengkap] = useState(false);
-    const [showAktifKaryawan, setShowAktifKaryawan] = useState(false);
+    // const [showNonAktif, setShowNonAktif] = useState(false);
+    // const [showNonLengkap, setShowNonLengkap] = useState(false);
+    // const [showAktifKaryawan, setShowAktifKaryawan] = useState(false);
 
     // Loading state
     const [loadingTabelSimpel, setLoadingTabelSimpel] = useState(false);
     const [loadingTabelLengkap, setLoadingTabelLengkap] = useState(false);
+    const [loadingTableNonLengkap, setLoadingTableNonLengkap] = useState(false);
+    const [loadingTableNonAktif, setLoadingTableNonAktif] = useState(false);
+    const [loadingAktifkanKaryawan, setLoadingAktifkanKaryawan] =
+        useState(false);
 
     // Ref untuk grafik
     const grafikRef = useRef(null);
@@ -44,7 +48,7 @@ const Pegawai = () => {
                                             ${item.id}
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="defaultDropdown">
-                                            <li><a class="dropdown-item" href="/kepegawaian/profilkaryawan/${item.id}"><i class="fa-fw fas fa-search nav-icon me-1"></i> Lihat Profil</a></li>
+                                            <li><a href="javascript:void(0);" class="dropdown-item btn-profil-pegawai" data-id="${item.id}"><i class="fa-fw fas fa-search nav-icon me-1"></i> Lihat Profil</a></li>
                                         </ul>
                                     </div>
                                 </td>`;
@@ -61,20 +65,30 @@ const Pegawai = () => {
                     content += `</tr>`;
                 });
                 $("#tampil-tbody").append(content);
-                initTooltips(document.querySelector("#tampil-tbody"));
+                $(".btn-profil-pegawai")
+                    .off("click")
+                    .on("click", function () {
+                        router.visit(
+                            route(
+                                "v4.sdi.pegawai.profil.index",
+                                $(this).data("id")
+                            )
+                        );
+                    });
                 // initDataTable("#dttable", { orderCol: 3, enableExport: true });
                 initDataTable("#dttable", {
                     orderCol: 3,
                     sort: "desc",
-                    displayLength: 10,
+                    displayLength: 20,
                     columnDefs: [
                         { width: "10%", targets: 0 },
                         { width: "20%", targets: 1 },
                         { width: "55%", targets: 2 },
                         { width: "15%", targets: 3 },
                     ],
-                    enableExport: true,
+                    enableExport: false,
                 });
+                initTooltips(document.querySelector("#tampil-tbody"));
             },
             error: () => {
                 iziToast.error({
@@ -82,6 +96,7 @@ const Pegawai = () => {
                     message: "Proses memuat Data Gagal!",
                     position: "topRight",
                 });
+                setLoadingTabelSimpel(false);
             },
             complete: () => {
                 setLoadingTabelSimpel(false);
@@ -109,13 +124,19 @@ const Pegawai = () => {
                 res.show.forEach((item) => {
                     content += "<tr id='data" + item.id + "'>";
                     content += `<td><center><div class='btn-group'>
-                                        <button class="btn btn-sm btn-outline-light btn-wave dropdown-toggle ${item.nik?'text-primary':'text-danger'}" type="button" data-bs-toggle="dropdown"
-                                            data-bs-auto-close="true" aria-expanded="false">${item.id}</button>
+                                        <button class="btn btn-sm btn-outline-light btn-wave dropdown-toggle ${
+                                            item.nik
+                                                ? "text-primary"
+                                                : "text-danger"
+                                        }" type="button" data-bs-toggle="dropdown"
+                                            data-bs-auto-close="true" aria-expanded="false">${
+                                                item.id
+                                            }</button>
                                     <ul class='dropdown-menu dropdown-menu-right'>`;
-                        content += `<li><a href="/kepegawaian/profilkaryawan/${item.id}" class='dropdown-item text-primary'><i class="fa-fw fas fa-search nav-icon me-1"></i> Lihat Profil</a></li>`;
+                    content += `<li><a href="/v4/sdi/pegawai/${item.id}" class='dropdown-item text-primary'><i class="fa-fw fas fa-search nav-icon me-1"></i> Lihat Profil</a></li>`;
                     content += `</div></center></td>`;
-                    content += `<td>${item.nip?item.nip:'-'}</td>`;
-                    content += `<td>${item.nik?item.nik:'-'}</td>`;
+                    content += `<td>${item.nip ? item.nip : "-"}</td>`;
+                    content += `<td>${item.nik ? item.nik : "-"}</td>`;
                     content += `<td>${item.name}</td>`;
                     if (item.nama_lengkap) {
                         pNama = item.nama_lengkap;
@@ -123,63 +144,142 @@ const Pegawai = () => {
                         if (item.nama) {
                             pNama = item.nama;
                         } else {
-                            pNama = '-';
+                            pNama = "-";
                         }
                     }
                     content += `<td>${pNama}</td>`;
-                    content += `<td>${item.nick?item.nick:'-'}</td>`;
-                    content += `<td>${item.temp_lahir?item.temp_lahir:'-'}${item.tgl_lahir?', '+item.tgl_lahir:''}</td>`;
-                    content += `<td>${item.jns_kelamin?item.jns_kelamin:'-'}</td>`;
-                    content += `<td>${item.status_kawin?item.status_kawin:'-'}</td>`;
-                    content += `<td>${item.status_pegawai?item.status_pegawai:'-'}</td>`;
+                    content += `<td>${item.nick ? item.nick : "-"}</td>`;
+                    content += `<td>${item.temp_lahir ? item.temp_lahir : "-"}${
+                        item.tgl_lahir ? ", " + item.tgl_lahir : ""
+                    }</td>`;
+                    content += `<td>${
+                        item.jns_kelamin ? item.jns_kelamin : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.status_kawin ? item.status_kawin : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.status_pegawai ? item.status_pegawai : "-"
+                    }</td>`;
                     content += `<td>`;
                     res.role.forEach((val) => {
                         if (item.id == val.id_user) {
-                            content += "<span class='badge bg-light-secondary'>" + val.nama_role + "</span>";
+                            content +=
+                                "<span class='badge bg-primary-transparent me-1'>" +
+                                val.nama_role +
+                                "</span>";
                         }
-                    })
+                    });
                     content += `</td>`;
-                    content += `<td>${item.klasifikasi_user?item.klasifikasi_user:'-'}</td>`;
-                    content += `<td>${item.masuk_kerja?item.masuk_kerja:'-'}</td>`;
-                    content += `<td>${item.urutan_masuk?item.urutan_masuk:'-'}</td>`;
-                    content += `<td>${item.tmt?item.tmt:'-'}</td>`;
-                    content += `<td>${item.tat?item.tat:'-'}</td>`;
-                    content += `<td>${item.no_hp?item.no_hp:'-'}</td>`;
-                    content += `<td>${item.email?item.email:'-'}</td>`;
-                    content += `<td>${item.fb?item.fb:'-'}</td>`;
-                    content += `<td>${item.ig?item.ig:'-'}</td>`;
-                    content += `<td>${item.tt?item.tt:'-'}</td>`;
-                    content += `<td>${item.ktp_kelurahan?item.ktp_kelurahan:'-'}</td>`;
-                    content += `<td>${item.ktp_kecamatan?item.ktp_kecamatan:'-'}</td>`;
-                    content += `<td>${item.ktp_kabupaten?item.ktp_kabupaten:'-'}</td>`;
-                    content += `<td>${item.ktp_provinsi?item.ktp_provinsi:'-'}</td>`;
-                    content += `<td>${item.alamat_ktp?item.alamat_ktp:'-'}</td>`;
-                    content += `<td>${item.dom_kelurahan?item.dom_kelurahan:'-'}</td>`;
-                    content += `<td>${item.dom_kecamatan?item.dom_kecamatan:'-'}</td>`;
-                    content += `<td>${item.dom_kabupaten?item.dom_kabupaten:'-'}</td>`;
-                    content += `<td>${item.dom_provinsi?item.dom_provinsi:'-'}</td>`;
-                    content += `<td>${item.alamat_dom?item.alamat_dom:'-'}</td>`;
-                    content += `<td>${item.sd?item.sd:'-'} ${item.th_sd?' ('+item.th_sd+')':''}</td>`;
-                    content += `<td>${item.smp?item.smp:'-'} ${item.th_smp?' ('+item.th_smp+')':''}</td>`;
-                    content += `<td>${item.sma?item.sma:'-'} ${item.th_sma?' ('+item.th_sma+')':''}</td>`;
-                    content += `<td>${item.d1?item.d1:'-'} ${item.th_d1?' ('+item.th_d1+')':''}</td>`;
-                    content += `<td>${item.d2?item.d2:'-'} ${item.th_d2?' ('+item.th_d2+')':''}</td>`;
-                    content += `<td>${item.d3?item.d3:'-'} ${item.th_d3?' ('+item.th_d3+')':''}</td>`;
-                    content += `<td>${item.d4?item.d4:'-'} ${item.th_d4?' ('+item.th_d4+')':''}</td>`;
-                    content += `<td>${item.s1?item.s1:'-'} ${item.th_s1?' ('+item.th_s1+')':''}</td>`;
-                    content += `<td>${item.s1_profesi?item.s1_profesi:'-'} ${item.th_s1_profesi?' ('+item.th_s1_profesi+')':''}</td>`;
-                    content += `<td>${item.s2?item.s2:'-'} ${item.th_s2?' ('+item.th_s2+')':''}</td>`;
-                    content += `<td>${item.s3?item.s3:'-'} ${item.th_s3?' ('+item.th_s3+')':''}</td>`;
-                    content += `<td>${item.pengalaman_kerja?item.pengalaman_kerja:'-'}</td>`;
-                    content += `<td>${item.riwayat_penyakit?item.riwayat_penyakit:'-'}</td>`;
-                    content += `<td>${item.riwayat_penyakit_keluarga?item.riwayat_penyakit_keluarga:'-'}</td>`;
-                    content += `<td>${item.riwayat_operasi?item.riwayat_operasi:'-'}</td>`;
-                    content += `<td>${item.riwayat_penggunaan_obat?item.riwayat_penggunaan_obat:'-'}</td>`;
-                    content += '<td>' + new Date(item.updated_at).toLocaleString("sv-SE") + '</td>';
+                    content += `<td>${
+                        item.klasifikasi_user ? item.klasifikasi_user : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.masuk_kerja ? item.masuk_kerja : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.urutan_masuk ? item.urutan_masuk : "-"
+                    }</td>`;
+                    content += `<td>${item.tmt ? item.tmt : "-"}</td>`;
+                    content += `<td>${item.tat ? item.tat : "-"}</td>`;
+                    content += `<td>${item.no_hp ? item.no_hp : "-"}</td>`;
+                    content += `<td>${item.email ? item.email : "-"}</td>`;
+                    content += `<td>${item.fb ? item.fb : "-"}</td>`;
+                    content += `<td>${item.ig ? item.ig : "-"}</td>`;
+                    content += `<td>${item.tt ? item.tt : "-"}</td>`;
+                    content += `<td>${
+                        item.ktp_kelurahan ? item.ktp_kelurahan : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.ktp_kecamatan ? item.ktp_kecamatan : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.ktp_kabupaten ? item.ktp_kabupaten : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.ktp_provinsi ? item.ktp_provinsi : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.alamat_ktp ? item.alamat_ktp : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.dom_kelurahan ? item.dom_kelurahan : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.dom_kecamatan ? item.dom_kecamatan : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.dom_kabupaten ? item.dom_kabupaten : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.dom_provinsi ? item.dom_provinsi : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.alamat_dom ? item.alamat_dom : "-"
+                    }</td>`;
+                    content += `<td>${item.sd ? item.sd : "-"} ${
+                        item.th_sd ? " (" + item.th_sd + ")" : ""
+                    }</td>`;
+                    content += `<td>${item.smp ? item.smp : "-"} ${
+                        item.th_smp ? " (" + item.th_smp + ")" : ""
+                    }</td>`;
+                    content += `<td>${item.sma ? item.sma : "-"} ${
+                        item.th_sma ? " (" + item.th_sma + ")" : ""
+                    }</td>`;
+                    content += `<td>${item.d1 ? item.d1 : "-"} ${
+                        item.th_d1 ? " (" + item.th_d1 + ")" : ""
+                    }</td>`;
+                    content += `<td>${item.d2 ? item.d2 : "-"} ${
+                        item.th_d2 ? " (" + item.th_d2 + ")" : ""
+                    }</td>`;
+                    content += `<td>${item.d3 ? item.d3 : "-"} ${
+                        item.th_d3 ? " (" + item.th_d3 + ")" : ""
+                    }</td>`;
+                    content += `<td>${item.d4 ? item.d4 : "-"} ${
+                        item.th_d4 ? " (" + item.th_d4 + ")" : ""
+                    }</td>`;
+                    content += `<td>${item.s1 ? item.s1 : "-"} ${
+                        item.th_s1 ? " (" + item.th_s1 + ")" : ""
+                    }</td>`;
+                    content += `<td>${
+                        item.s1_profesi ? item.s1_profesi : "-"
+                    } ${
+                        item.th_s1_profesi
+                            ? " (" + item.th_s1_profesi + ")"
+                            : ""
+                    }</td>`;
+                    content += `<td>${item.s2 ? item.s2 : "-"} ${
+                        item.th_s2 ? " (" + item.th_s2 + ")" : ""
+                    }</td>`;
+                    content += `<td>${item.s3 ? item.s3 : "-"} ${
+                        item.th_s3 ? " (" + item.th_s3 + ")" : ""
+                    }</td>`;
+                    content += `<td>${
+                        item.pengalaman_kerja ? item.pengalaman_kerja : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.riwayat_penyakit ? item.riwayat_penyakit : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.riwayat_penyakit_keluarga
+                            ? item.riwayat_penyakit_keluarga
+                            : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.riwayat_operasi ? item.riwayat_operasi : "-"
+                    }</td>`;
+                    content += `<td>${
+                        item.riwayat_penggunaan_obat
+                            ? item.riwayat_penggunaan_obat
+                            : "-"
+                    }</td>`;
+                    content +=
+                        "<td>" +
+                        new Date(item.updated_at).toLocaleString("sv-SE") +
+                        "</td>";
                     content += `</tr>`;
-                })
-                $('#tampil-tbody-all').append(content);
-                initTooltips(document.querySelector("#tampil-tbody-all"));
+                });
+                $("#tampil-tbody-all").append(content);
                 initDataTable("#dttable-all", {
                     orderCol: 47,
                     sort: "desc",
@@ -225,6 +325,7 @@ const Pegawai = () => {
                     ],
                     enableExport: true,
                 });
+                initTooltips(document.querySelector("#tampil-tbody-all"));
             },
             error: () => {
                 iziToast.error({
@@ -239,7 +340,27 @@ const Pegawai = () => {
         });
     };
 
+    const showGrafik = () => {
+        // Tampilkan card grafik
+        $("#show-card-grafik").prop("hidden", false);
+
+        // Sembunyikan tombol
+        $("#btn-show-grafik").prop("hidden", true);
+
+        // Jalankan fungsi loadGrafik
+        loadGrafik(5, "Berdasarkan Status Pegawai");
+    };
+
+    const hideGrafik = () => {
+        $("#show-card-grafik").prop("hidden", true);
+        $("#btn-show-grafik").prop("hidden", false);
+    };
+
+    const [isCheckedAktifKaryawan, setIsCheckedAktifKaryawan] = useState(false);
+    const [idAktifKaryawan, setIdAktifKaryawan] = useState("");
+
     const refreshNonAktif = () => {
+        setLoadingTableNonAktif(true);
         showLoading("#tampil-tbody-nonaktif", 9);
         $.ajax({
             url: "/api/profilkaryawan/nonaktif",
@@ -252,14 +373,14 @@ const Pegawai = () => {
                 $("#tampil-tbody-nonaktif").empty();
                 res.show.forEach((item) => {
                     let urlShow = `/kepegawaian/profilkaryawan/${item.id}`;
-                    let pNama = '';
+                    let pNama = "";
                     if (item.nama_lengkap) {
                         pNama = item.nama_lengkap;
                     } else {
                         if (item.nama) {
                             pNama = item.nama;
                         } else {
-                            pNama = '-';
+                            pNama = "-";
                         }
                     }
                     $("#tampil-tbody-nonaktif").append(`
@@ -267,15 +388,19 @@ const Pegawai = () => {
                             <td><center>${item.id}</center></td>
                             <td>${item.name}</td>
                             <td>${pNama}</td>
-                            <td>${new Date(item.deleted_at).toLocaleString("sv-SE")}</td>
+                            <td>${new Date(item.deleted_at).toLocaleString(
+                                "sv-SE"
+                            )}</td>
                             <td>
                                 <center>
                                     <div class='btn-group'>
                                         <a href="${urlShow}" class='btn btn-sm btn-info-light'>
-                                            <i class='fa-fw fas fa-file-archive nav-icon'></i> Lihat Profil
+                                            <i class='fa-fw fas fa-file-archive nav-icon me-1'></i> Lihat Profil
                                         </a>
-                                        <a href='javascript:void(0);' class='btn btn-sm btn-success-light' onclick="showAktifKaryawan(${item.id})">
-                                            <i class='fa-fw fas fa-user-check nav-icon'></i> Aktifkan
+                                        <a href='javascript:void(0);' class='btn btn-sm btn-success-light btn-aktifkan-karyawan' data-id='${
+                                            item.id
+                                        }'>
+                                            <i class='fas fa-user-check me-1'></i> Aktifkan
                                         </a>
                                     </div>
                                 </center>
@@ -283,6 +408,13 @@ const Pegawai = () => {
                         </tr>
                     `);
                 });
+
+                $(".btn-aktifkan-karyawan")
+                    .off("click")
+                    .on("click", function () {
+                        modalAktifkanKaryawan($(this).data("id"));
+                    });
+
                 initDataTable("#dttable-nonaktif", {
                     orderCol: 3,
                     sort: "desc",
@@ -297,11 +429,87 @@ const Pegawai = () => {
                     message: "Proses memuat Data Pegawai Nonaktif Gagal!",
                     position: "topRight",
                 });
+                setLoadingTableNonAktif(false);
+            },
+            complete: () => {
+                setLoadingTableNonAktif(false);
+            },
+        });
+    };
+
+    const modalAktifkanKaryawan = (id) => {
+        setIdAktifKaryawan(id);
+        setIsCheckedAktifKaryawan(false);
+
+        // $(".modal.show").each(function () {
+        //     const modalInstance = bootstrap.Modal.getInstance(this);
+        //     if (modalInstance) modalInstance.hide();
+        // });
+
+        const modalNonAktif = bootstrap.Modal.getInstance(
+            document.getElementById("karyawanNonAktif")
+        );
+        if (modalNonAktif) modalNonAktif.hide();
+
+        const modalAktif = new bootstrap.Modal(
+            document.getElementById("aktifkanKaryawan")
+        );
+        modalAktif.show();
+    };
+
+    const batalNonAktif = async () => {
+        if (!isCheckedAktifKaryawan) {
+            iziToast.error({
+                title: "Pesan Galat!",
+                message:
+                    "Mohon menyetujui untuk melakukan pengaktifan karyawan kembali",
+                position: "topRight",
+            });
+            return;
+        }
+
+        setLoadingAktifkanKaryawan(true);
+        $.ajax({
+            url: `/api/v4/sdi/pegawai/setaktif/${idAktifKaryawan}`,
+            type: "GET",
+            dataType: "json",
+            beforeSend: function () {
+                // Bisa tambahkan indikator loading jika mau
+                console.log("Mengaktifkan karyawan...");
+            },
+            success: function (res) {
+                iziToast.success({
+                    title: "Sukses!",
+                    message: `User ID: ${idAktifKaryawan} sukses diaktifkan kembali pada ${res}`,
+                    position: "topRight",
+                });
+
+                // Tutup modal Bootstrap
+                const modalEl = document.getElementById("aktifkanKaryawan");
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
+                // Refresh tabel / data
+                refreshNonAktif();
+                refresh();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error:", status, error);
+                iziToast.error({
+                    title: "Pesan Galat!",
+                    message: "Gagal mengaktifkan Pegawai!",
+                    position: "topRight",
+                });
+                setLoadingAktifkanKaryawan(false);
+            },
+            complete: function () {
+                setLoadingAktifkanKaryawan(false);
             },
         });
     };
 
     const refreshNonLengkap = () => {
+        setLoadingTableNonLengkap(true);
         showLoading("#tampil-tbody-nonlengkap", 9);
         $.ajax({
             url: "/api/profilkaryawan/nonlengkap",
@@ -317,7 +525,9 @@ const Pegawai = () => {
                         <tr>
                             <td><center>${item.id}</center></td>
                             <td>${item.name}</td>
-                            <td>${new Date(item.created_at).toLocaleString("sv-SE")}</td>
+                            <td>${new Date(item.created_at).toLocaleString(
+                                "sv-SE"
+                            )}</td>
                         </tr>
                     `);
                 });
@@ -332,31 +542,34 @@ const Pegawai = () => {
             error: () => {
                 iziToast.error({
                     title: "Pesan Galat!",
-                    message: "Proses memuat Data Profil Pegawai Yang Tidak lengkap Gagal!",
+                    message:
+                        "Proses memuat Data Profil Pegawai Yang Tidak lengkap Gagal!",
                     position: "topRight",
                 });
+                setLoadingTableNonLengkap(fales);
+            },
+            complete: () => {
+                setLoadingTableNonLengkap(false);
             },
         });
     };
 
     // ============ GRAFIK ==============
-    const showGrafikStatusPegawai = () =>
-        loadGrafik(5, "Berdasarkan Status Pegawai");
-
     const loadGrafik = (id, title) => {
         $.ajax({
-            url: `/profilkaryawan/grafik/${id}`,
+            url: `/api/v4/sdi/pegawai/grafik/${id}`,
             type: "GET",
             dataType: "json",
             success: (res) => {
-                setGrafikTitle(
-                    title +
-                        (res.belumMasuk
-                            ? ` (${res.belumMasuk} pegawai belum diinput)`
-                            : " (Data Seluruh Pegawai)")
-                );
+                setGrafikTitle({
+                    title,
+                    belumMasuk: res.belumMasuk,
+                });
 
-                if (grafik) grafik.destroy();
+                if (grafik) {
+                    grafik.destroy();
+                    setGrafik(null);
+                }
 
                 const options = {
                     chart: { type: "pie", width: "100%" },
@@ -399,9 +612,66 @@ const Pegawai = () => {
                     stroke: { show: true, width: 1, colors: ["#fff"] },
                 };
 
-                const chart = new ApexCharts(grafikRef.current, options);
-                chart.render();
-                setGrafik(chart);
+                // Render chart ke elemen
+                const grafikInstance = new ApexCharts(
+                    $("#grafik-show")[0],
+                    options
+                );
+                grafikInstance.render().then(() => {
+                    // Ambil warna chart
+                    let chartColors = grafikInstance.w.config.colors;
+
+                    // Hitung total
+                    var total = res.series.reduce((a, b) => a + b, 0);
+                    var listHTML = "";
+
+                    res.labels.forEach(function (label, i) {
+                        var jumlah = res.series[i];
+                        var persen =
+                            total > 0 ? ((jumlah / total) * 100).toFixed(1) : 0;
+
+                        listHTML += `
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <div class="avtar avtar-s">
+                                        <i class="ti ti-player-record f-40" style="color: ${
+                                            chartColors[i]
+                                        }"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <div class="row g-1">
+                                        <div class="col-6">
+                                            <h6 class="text-dark mb-1">${label}</h6>
+                                            <a class="text-muted"><i>REFID # ${
+                                                res.refid[i]
+                                            }</i></a>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <h6 class="mb-1"><b class="text-${
+                                                jumlah == 0 ? "dark" : "danger"
+                                            }">${jumlah}</b> Pegawai</h6>
+                                            <a class="text-success mb-0">${persen}%</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    `;
+                    });
+
+                    $("#list-grafik").html(listHTML);
+                });
+
+                setGrafik(grafikInstance);
+            },
+            error: () => {
+                iziToast.error({
+                    title: "Pesan Galat!",
+                    message: "Gagal memuat grafik!",
+                    position: "topRight",
+                });
             },
         });
     };
@@ -463,6 +733,18 @@ const Pegawai = () => {
                                         <h5 className="mb-0">
                                             <i className="ph-duotone ph-database me-1"></i>{" "}
                                             Grafik Interaktif Pegawai
+                                            <button
+                                                className="btn btn-sm btn-icon btn-danger-light ms-2 rounded-pill btn-wave"
+                                                id="btn-hide-grafik"
+                                                onClick={() => hideGrafik()}
+                                                data-bs-toggle="tooltip"
+                                                data-bs-offset="0,4"
+                                                data-bs-placement="bottom"
+                                                data-bs-html="true"
+                                                title="Sembunyikan Grafik"
+                                            >
+                                                <i className="fa fa-times"></i>
+                                            </button>
                                         </h5>
                                     </div>
                                     <div className="flex-shrink-0 ms-3">
@@ -480,7 +762,10 @@ const Pegawai = () => {
                                                     className="dropdown-item"
                                                     href="#"
                                                     onClick={() =>
-                                                        showGrafikJenisPegawai()
+                                                        loadGrafik(
+                                                            1,
+                                                            "Berdasarkan Jenis Pegawai"
+                                                        )
                                                     }
                                                 >
                                                     Jenis Pegawai
@@ -489,7 +774,10 @@ const Pegawai = () => {
                                                     className="dropdown-item"
                                                     href="#"
                                                     onClick={() =>
-                                                        showGrafikJenisKelamin()
+                                                        loadGrafik(
+                                                            2,
+                                                            "Berdasarkan Jenis Kelamin Pegawai"
+                                                        )
                                                     }
                                                 >
                                                     Jenis Kelamin
@@ -498,7 +786,10 @@ const Pegawai = () => {
                                                     className="dropdown-item"
                                                     href="#"
                                                     onClick={() =>
-                                                        showGrafikPendidikan()
+                                                        loadGrafik(
+                                                            3,
+                                                            "Berdasarkan Pendidikan Pegawai"
+                                                        )
                                                     }
                                                 >
                                                     Pendidikan
@@ -507,7 +798,10 @@ const Pegawai = () => {
                                                     className="dropdown-item"
                                                     href="#"
                                                     onClick={() =>
-                                                        showGrafikProfesi()
+                                                        loadGrafik(
+                                                            4,
+                                                            "Berdasarkan Profesi Pegawai"
+                                                        )
                                                     }
                                                 >
                                                     Profesi
@@ -516,7 +810,10 @@ const Pegawai = () => {
                                                     className="dropdown-item"
                                                     href="#"
                                                     onClick={() =>
-                                                        showGrafikStatusPegawai()
+                                                        loadGrafik(
+                                                            5,
+                                                            "Berdasarkan Status Pegawai"
+                                                        )
                                                     }
                                                 >
                                                     Status Pegawai
@@ -525,7 +822,10 @@ const Pegawai = () => {
                                                     className="dropdown-item"
                                                     href="#"
                                                     onClick={() =>
-                                                        showGrafikStatusKawin()
+                                                        loadGrafik(
+                                                            6,
+                                                            "Berdasarkan Status Perkawinan Pegawai"
+                                                        )
                                                     }
                                                 >
                                                     Status Perkawinan
@@ -543,12 +843,20 @@ const Pegawai = () => {
                                     ></ul>
                                 </div>
                                 <div className="col-md-5 align-items-center">
-                                    <h5
-                                        className="text-center my-2"
-                                        id="show-name-grafik"
-                                    ></h5>
+                                    <h5 className="text-center my-2">
+                                        {grafikTitle.title}{" "}
+                                        {grafikTitle.belumMasuk ? (
+                                            <b className="text-danger">
+                                                ({grafikTitle.belumMasuk}{" "}
+                                                pegawai belum lengkap)
+                                            </b>
+                                        ) : (
+                                            ''
+                                        )}
+                                    </h5>
                                     <div
                                         id="grafik-show"
+                                        ref={grafikRef}
                                         style={{
                                             width: "100%",
                                             minHeight: "400px",
@@ -572,6 +880,9 @@ const Pegawai = () => {
                                                 "/akunpengguna")
                                         }
                                         data-bs-toggle="tooltip"
+                                        data-bs-offset="0,4"
+                                        data-bs-placement="bottom"
+                                        data-bs-html="true"
                                         title="Pengaturan Akun Pegawai"
                                         disabled={true}
                                     >
@@ -584,13 +895,16 @@ const Pegawai = () => {
                                         id="btn-tabel-simpel"
                                         onClick={() => refresh()}
                                         data-bs-toggle="tooltip"
+                                        data-bs-offset="0,4"
+                                        data-bs-placement="bottom"
+                                        data-bs-html="true"
                                         title="Menampilkan Data Simpel Pegawai"
                                     >
                                         <i
                                             className={`fas me-1 ${
                                                 loadingTabelSimpel
                                                     ? "fa-sync fa-spin"
-                                                    : "fa-sync"
+                                                    : "ri-table-line"
                                             }`}
                                         ></i>
                                         Tabel Simpel
@@ -601,15 +915,33 @@ const Pegawai = () => {
                                         id="btn-tabel-lengkap"
                                         onClick={() => showAll()}
                                         data-bs-toggle="tooltip"
+                                        data-bs-offset="0,4"
+                                        data-bs-placement="bottom"
+                                        data-bs-html="true"
                                         title="Menampilkan Seluruh Data Profil Pegawai"
                                     >
                                         <i
                                             className={`fas me-1 ${
                                                 loadingTabelLengkap
                                                     ? "fa-sync fa-spin"
-                                                    : "fa-infinity"
-                                            }`}></i>{" "}
+                                                    : "ri-infinity-line"
+                                            }`}
+                                        ></i>
                                         Tabel Lengkap
+                                    </button>
+
+                                    <button
+                                        className="btn btn-info-light btn-wave"
+                                        id="btn-show-grafik"
+                                        onClick={() => showGrafik()}
+                                        data-bs-toggle="tooltip"
+                                        data-bs-offset="0,4"
+                                        data-bs-placement="bottom"
+                                        data-bs-html="true"
+                                        title="Menampilkan Grafik Data Pegawai"
+                                    >
+                                        <i class="ri-pie-chart-2-line me-1"></i>
+                                        Tampilkan Grafik
                                     </button>
                                 </div>
 
@@ -624,29 +956,44 @@ const Pegawai = () => {
                                         <i
                                             className="ti ti-dots-vertical f-18"
                                             data-bs-toggle="tooltip"
+                                            data-bs-offset="0,4"
+                                            data-bs-placement="left"
+                                            data-bs-html="true"
                                             title="Pilihan Menu Lainnya"
                                         ></i>
                                     </button>
                                     <ul className="dropdown-menu">
                                         <li>
-                                            <a
+                                            <button
                                                 className="dropdown-item"
-                                                href="#"
-                                                onClick={() =>
-                                                    setShowNonLengkap(true)
-                                                }
+                                                onClick={() => {
+                                                    const modal =
+                                                        new bootstrap.Modal(
+                                                            document.getElementById(
+                                                                "profilNonLengkap"
+                                                            )
+                                                        );
+                                                    modal.show();
+                                                    refreshNonLengkap();
+                                                }}
                                             >
                                                 Profil Belum Lengkap
-                                            </a>
-                                            <a
+                                            </button>
+                                            <button
                                                 className="dropdown-item"
-                                                href="#"
-                                                onClick={() =>
-                                                    setShowNonAktif(true)
-                                                }
+                                                onClick={() => {
+                                                    const modal =
+                                                        new bootstrap.Modal(
+                                                            document.getElementById(
+                                                                "karyawanNonAktif"
+                                                            )
+                                                        );
+                                                    modal.show();
+                                                    refreshNonAktif();
+                                                }}
                                             >
                                                 Karyawan Nonaktif
-                                            </a>
+                                            </button>
                                         </li>
                                     </ul>
                                 </div>
@@ -859,251 +1206,277 @@ const Pegawai = () => {
                     </div>
                 </div>
 
-                {/* Modal Nonaktif */}
-                {showNonAktif && (
-                    <div
-                        className="modal fade show d-block"
-                        tabIndex="-1"
-                        role="dialog"
-                    >
-                        <div
-                            className="modal-dialog modal-dialog-centered modal-xl"
-                            role="document"
-                        >
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <h4 className="modal-title">
-                                        Daftar Karyawan Nonaktif
-                                    </h4>
-                                    <button
-                                        type="button"
-                                        className="btn-close"
-                                        onClick={() => setShowNonAktif(false)}
-                                    ></button>
-                                </div>
-                                <div className="modal-body p-1">
-                                    <div className="table-responsive text-nowrap table-card">
-                                        <table
-                                            id="dttable-nonaktif"
-                                            className="table dt-responsive table-hover nowrap w-100"
-                                        >
-                                            <thead>
-                                                <tr>
-                                                    <th className="cell-fit">
-                                                        <center>ID</center>
-                                                    </th>
-                                                    <th className="cell-fit">
-                                                        NAME
-                                                    </th>
-                                                    <th className="cell-fit">
-                                                        NAMA LENGKAP
-                                                    </th>
-                                                    <th className="cell-fit">
-                                                        TGL NONAKTIF
-                                                    </th>
-                                                    <th className="cell-fit">
-                                                        <center>#</center>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tampil-tbody-nonaktif">
-                                                <tr>
-                                                    <td
-                                                        colSpan="9"
-                                                        style={{
-                                                            fontSize: "13px",
-                                                        }}
-                                                    >
-                                                        <center>
-                                                            <i className="fa fa-spinner fa-spin fa-fw"></i>{" "}
-                                                            Memproses data...
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div className="modal-footer">
-                                    <button
-                                        className="btn btn-label-secondary"
-                                        onClick={() => setShowNonAktif(false)}
-                                    >
-                                        <i className="fas fa-chevron-left"></i>
-                                        &nbsp;&nbsp;Tutup
-                                    </button>
-                                    <button
-                                        className="btn btn-warning"
-                                        onClick={() => refreshNonAktif()}
-                                    >
-                                        <i className="fa-fw fas fa-sync nav-icon"></i>
-                                        &nbsp;&nbsp;Segarkan
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
                 {/* Modal Nonlengkap */}
-                {showNonLengkap && (
+                <div
+                    className="modal fade"
+                    tabIndex="-1"
+                    role="dialog"
+                    id="profilNonLengkap"
+                    aria-hidden="true"
+                >
                     <div
-                        className="modal fade show d-block"
-                        tabIndex="-1"
-                        role="dialog"
+                        className="modal-dialog modal-dialog-centered modal-lg"
+                        role="document"
                     >
-                        <div
-                            className="modal-dialog modal-dialog-centered modal-lg"
-                            role="document"
-                        >
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <h4 className="modal-title">
-                                        Daftar Profil Karyawan Belum Lengkap
-                                    </h4>
-                                    <button
-                                        type="button"
-                                        className="btn-close"
-                                        onClick={() => setShowNonLengkap(false)}
-                                    ></button>
-                                </div>
-                                <div className="modal-body p-1">
-                                    <div
-                                        className="table-responsive text-nowrap"
-                                        style={{ border: 0 }}
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h4 className="modal-title">
+                                    Daftar Profil Karyawan{" "}
+                                    <b className="text-secondary">
+                                        Belum Lengkap
+                                    </b>
+                                </h4>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    data-bs-dismiss="modal"
+                                ></button>
+                            </div>
+                            <div className="modal-body p-1">
+                                <div
+                                    className="table-responsive text-nowrap"
+                                    style={{ border: 0 }}
+                                >
+                                    <table
+                                        id="dttable-nonlengkap"
+                                        className="table dt-responsive table-hover nowrap w-100"
                                     >
-                                        <table
-                                            id="dttable-nonlengkap"
-                                            className="table dt-responsive table-hover nowrap w-100"
-                                        >
-                                            <thead>
-                                                <tr>
-                                                    <th className="cell-fit">
-                                                        <center>ID</center>
-                                                    </th>
-                                                    <th className="cell-fit">
-                                                        NAME
-                                                    </th>
-                                                    <th className="cell-fit">
-                                                        DITAMBAHKAN
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="tampil-tbody-nonlengkap">
-                                                <tr>
-                                                    <td
-                                                        colSpan="9"
-                                                        style={{
-                                                            fontSize: "13px",
-                                                        }}
-                                                    >
-                                                        <center>
-                                                            <i className="fa fa-spinner fa-spin fa-fw"></i>{" "}
-                                                            Memproses data...
-                                                        </center>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                        <thead>
+                                            <tr>
+                                                <th className="cell-fit">
+                                                    <center>ID</center>
+                                                </th>
+                                                <th className="cell-fit">
+                                                    NAME
+                                                </th>
+                                                <th className="cell-fit">
+                                                    DITAMBAHKAN
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tampil-tbody-nonlengkap">
+                                            <tr>
+                                                <td
+                                                    colSpan="9"
+                                                    style={{
+                                                        fontSize: "13px",
+                                                    }}
+                                                >
+                                                    <center>
+                                                        <i className="fa fa-spinner fa-spin fa-fw"></i>{" "}
+                                                        Memproses data...
+                                                    </center>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
-                                <div className="modal-footer">
-                                    <button
-                                        className="btn btn-label-secondary"
-                                        onClick={() => setShowNonLengkap(false)}
-                                    >
-                                        <i className="fas fa-chevron-left"></i>
-                                        &nbsp;&nbsp;Tutup
-                                    </button>
-                                    <button
-                                        className="btn btn-warning"
-                                        onClick={() => refreshNonLengkap()}
-                                    >
-                                        <i className="fa-fw fas fa-sync nav-icon"></i>
-                                        &nbsp;&nbsp;Segarkan
-                                    </button>
-                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    className="btn btn-outline-light"
+                                    data-bs-dismiss="modal"
+                                >
+                                    <i className="fas fa-chevron-left"></i>
+                                    &nbsp;&nbsp;Tutup
+                                </button>
+                                <button
+                                    className="btn btn-warning"
+                                    onClick={() => refreshNonLengkap()}
+                                >
+                                    <i
+                                        className={`fas me-1 fa-sync ${
+                                            loadingTableNonLengkap
+                                                ? "fa-spin"
+                                                : ""
+                                        }`}
+                                    ></i>
+                                    &nbsp;&nbsp;Segarkan
+                                </button>
                             </div>
                         </div>
                     </div>
-                )}
+                </div>
 
-                {/* Modal Aktif Karyawan */}
-                {showAktifKaryawan && (
+                {/* Modal Nonaktif */}
+                <div
+                    className="modal fade"
+                    tabIndex="-1"
+                    role="dialog"
+                    id="karyawanNonAktif"
+                    aria-hidden="true"
+                >
                     <div
-                        className="modal fade show d-block"
-                        tabIndex="-1"
-                        role="dialog"
+                        className="modal-dialog modal-dialog-centered modal-xl"
+                        role="document"
                     >
-                        <div className="modal-dialog modal-simple modal-add-new-address modal-dialog-centered">
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <h4 className="modal-title">
-                                        Apakah Anda sudah Yakin?
-                                    </h4>
-                                </div>
-                                <div className="modal-body">
-                                    <input
-                                        type="text"
-                                        id="id_aktif_karyawan"
-                                        hidden
-                                    />
-                                    <p style={{ textAlign: "justify" }}>
-                                        Anda akan mengaktifkan kembali karyawan
-                                        dengan{" "}
-                                        <kbd>
-                                            ID :{" "}
-                                            <a id="show_id_aktif_karyawan"></a>
-                                        </kbd>{" "}
-                                        dan/apabila melanjutkan proses Submit,
-                                        data Anda akan tercatat dalam database.
-                                    </p>
-                                    <label className="switch">
-                                        <input
-                                            type="checkbox"
-                                            className="switch-input"
-                                            id="setujuaktifkaryawan"
-                                        />
-                                        <span className="switch-toggle-slider">
-                                            <span className="switch-on"></span>
-                                            <span className="switch-off"></span>
-                                        </span>
-                                        <span className="switch-label">
-                                            Saya Setuju
-                                        </span>
-                                    </label>
-                                </div>
-                                <div className="col-12 text-center mb-4">
-                                    <button
-                                        type="submit"
-                                        id="btn-aktif-karyawan"
-                                        className="btn btn-danger me-sm-3 me-1"
-                                        onClick={() => batalNonAktif()}
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h4 className="modal-title">
+                                    Daftar Karyawan{" "}
+                                    <b className="text-danger">Nonaktif</b>
+                                </h4>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    data-bs-dismiss="modal"
+                                ></button>
+                            </div>
+                            <div className="modal-body p-1">
+                                <div className="table-responsive text-nowrap table-card">
+                                    <table
+                                        id="dttable-nonaktif"
+                                        className="table dt-responsive table-hover nowrap w-100"
                                     >
-                                        <i
-                                            className="ti ti-checkbox me-1"
-                                            style={{ fontSize: "13px" }}
-                                        ></i>{" "}
-                                        Submit
-                                    </button>
-                                    <button
-                                        type="reset"
-                                        className="btn btn-outline-secondary"
-                                        onClick={() =>
-                                            setShowAktifKaryawan(false)
-                                        }
-                                    >
-                                        <i
-                                            className="fa fa-times me-1"
-                                            style={{ fontSize: "13px" }}
-                                        ></i>{" "}
-                                        Tutup
-                                    </button>
+                                        <thead>
+                                            <tr>
+                                                <th className="cell-fit">
+                                                    <center>ID</center>
+                                                </th>
+                                                <th className="cell-fit">
+                                                    NAME
+                                                </th>
+                                                <th className="cell-fit">
+                                                    NAMA LENGKAP
+                                                </th>
+                                                <th className="cell-fit">
+                                                    TGL NONAKTIF
+                                                </th>
+                                                <th className="cell-fit">
+                                                    <center>#</center>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tampil-tbody-nonaktif">
+                                            <tr>
+                                                <td
+                                                    colSpan="9"
+                                                    style={{
+                                                        fontSize: "13px",
+                                                    }}
+                                                >
+                                                    <center>
+                                                        <i className="fa fa-spinner fa-spin fa-fw"></i>{" "}
+                                                        Memproses data...
+                                                    </center>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    className="btn btn-outline-light"
+                                    data-bs-dismiss="modal"
+                                >
+                                    <i className="fas fa-chevron-left"></i>
+                                    &nbsp;&nbsp;Tutup
+                                </button>
+                                <button
+                                    className="btn btn-warning"
+                                    onClick={() => refreshNonAktif()}
+                                >
+                                    <i
+                                        className={`fas me-1 fa-sync ${
+                                            loadingTableNonAktif
+                                                ? "fa-spin"
+                                                : ""
+                                        }`}
+                                    ></i>
+                                    &nbsp;&nbsp;Segarkan
+                                </button>
                             </div>
                         </div>
                     </div>
-                )}
+                </div>
+
+                {/* Modal Aktivasi Karyawan */}
+                <div
+                    className="modal fade"
+                    tabIndex="-1"
+                    role="dialog"
+                    id="aktifkanKaryawan"
+                    aria-hidden="true"
+                >
+                    <div className="modal-dialog modal-simple modal-add-new-address modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h4 className="modal-title">
+                                    Apakah Anda sudah Yakin?
+                                </h4>
+                            </div>
+                            <div className="modal-body">
+                                <input
+                                    type="hidden"
+                                    value={idAktifKaryawan}
+                                    readOnly
+                                />
+                                <p style={{ textAlign: "justify" }}>
+                                    Anda akan mengaktifkan kembali karyawan
+                                    dengan{" "}
+                                    <kbd>
+                                        #ID:<a>{idAktifKaryawan}</a>
+                                    </kbd>{" "}
+                                    dan/apabila melanjutkan proses Submit, data
+                                    Anda akan tercatat dalam database.
+                                </p>
+                                <label className="switch">
+                                    <input
+                                        type="checkbox"
+                                        className="switch-input"
+                                        id="setujuaktifkaryawan"
+                                        checked={isCheckedAktifKaryawan}
+                                        onChange={(e) =>
+                                            setIsCheckedAktifKaryawan(
+                                                e.target.checked
+                                            )
+                                        }
+                                    />
+                                    <span className="switch-toggle-slider me-2">
+                                        <span className="switch-on"></span>
+                                        <span className="switch-off"></span>
+                                    </span>
+                                    <span className="switch-label">
+                                        Saya Setuju
+                                    </span>
+                                </label>
+                            </div>
+                            <div className="col-12 text-center mb-4">
+                                <button
+                                    type="submit"
+                                    id="btn-aktif-karyawan"
+                                    className="btn btn-danger me-sm-3 me-1"
+                                    onClick={batalNonAktif}
+                                >
+                                    <i
+                                        className={`me-1 ${
+                                            loadingAktifkanKaryawan
+                                                ? "fas fa-sync fa-spin"
+                                                : "ti ti-checkbox"
+                                        }`}
+                                        style={{ fontSize: "13px" }}
+                                    ></i>{" "}
+                                    Submit
+                                </button>
+                                <button
+                                    data-bs-dismiss="modal"
+                                    className="btn btn-light"
+                                    onClick={() => {
+                                        $("#aktifkanKaryawan").modal("hide");
+                                        $("#karyawanNonAktif").modal("show");
+                                    }}
+                                >
+                                    <i
+                                        className="fa fa-times me-1"
+                                        style={{ fontSize: "13px" }}
+                                    ></i>{" "}
+                                    Tutup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </>
     );

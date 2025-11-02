@@ -23,17 +23,29 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware(['web','auth:sanctum'])->group(function () {
-    Route::get('v4/provinsi/{id}', [ProfilController::class, 'apiProvinsi']);
-    Route::get('v4/kota/{id}', [ProfilController::class, 'apiKota']);
-    Route::get('v4/kecamatan/{id}', [ProfilController::class, 'apiKecamatan']);
+    // PROFIL AKUN
     Route::get('v4/profil/dokumen/table/{id}', [ProfilController::class, 'tableDokumen']);
     Route::post('v4/profil/dokumen/add', [ProfilController::class, 'tambahDokumen']);
     Route::post('v4/profil/dokumen/ubah/{id}/proses', [ProfilController::class, 'ubahDokumen']);
     Route::delete('v4/profil/dokumen/hapus/{id}/proses', [ProfilController::class, 'hapusDokumen']);
     Route::get('v4/profil/dokumen/ubah/{id}', [ProfilController::class, 'showUbahDokumen']);
     Route::get('v4/profil/spkrkk/table/{id}', [ProfilController::class, 'tableSpkrkk']);
-    Route::get('v4/sdi/pegawai/table', [PegawaiController::class, 'table'])->name('tablePegawai');
-    Route::get('v4/sdi/pegawai/tableall', [PegawaiController::class, 'tableAll'])->name('tablePegawaiAll');
+    Route::get('v4/provinsi/{id}', [ProfilController::class, 'apiProvinsi']);
+    Route::get('v4/kota/{id}', [ProfilController::class, 'apiKota']);
+    Route::get('v4/kecamatan/{id}', [ProfilController::class, 'apiKecamatan']);
+
+    // SDI
+        // DAFTAR PEGAWAI
+        Route::get('v4/sdi/pegawai/table', [PegawaiController::class, 'table'])->name('tablePegawai');
+        Route::get('v4/sdi/pegawai/tableall', [PegawaiController::class, 'tableAll'])->name('tablePegawaiAll');
+        Route::get('v4/sdi/pegawai/setaktif/{id}', [PegawaiController::class, 'setAktif'])->name('setaktifPegawai');
+        // GRAFIK INTERAKTIF
+        Route::get('v4/sdi/pegawai/grafik/1', [PegawaiController::class, 'grafik1'])->name('apiGrafikSDI1'); // Jenis Pegawai
+        Route::get('v4/sdi/pegawai/grafik/2', [PegawaiController::class, 'grafik2'])->name('apiGrafikSDI2'); // Jenis Kelamin
+        Route::get('v4/sdi/pegawai/grafik/3', [PegawaiController::class, 'grafik3'])->name('apiGrafikSDI3'); // Pendidikan
+        Route::get('v4/sdi/pegawai/grafik/4', [PegawaiController::class, 'grafik4'])->name('apiGrafikSDI4'); // Profesi
+        Route::get('v4/sdi/pegawai/grafik/5', [PegawaiController::class, 'grafik5'])->name('apiGrafikSDI5'); // Status Pegawai
+        Route::get('v4/sdi/pegawai/grafik/6', [PegawaiController::class, 'grafik6'])->name('apiGrafikSDI6'); // Status Perkawinan
 });
 
 // Route::group(['middleware' => ['auth']], function () {

@@ -11,6 +11,7 @@ use App\Http\Controllers\React\Publik\DashboardController;
 use App\Http\Controllers\React\Publik\FeedbackController;
 use App\Http\Controllers\React\Akun\ProfilController;
 use App\Http\Controllers\React\SDI\PegawaiController;
+use App\Http\Controllers\React\SDI\ProfilPegawaiController;
 // use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Services\WhatsappService;
 
@@ -42,6 +43,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'v4', 'as' => ''], function 
 
     // SDI
     Route::get('sdi/pegawai', [PegawaiController::class, 'index'])->name('v4.sdi.pegawai.index');
+    Route::get('sdi/pegawai/{id}', [ProfilPegawaiController::class, 'index'])->name('v4.sdi.pegawai.profil.index');
 
     // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
